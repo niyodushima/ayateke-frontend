@@ -111,14 +111,16 @@ const StaffDashboard = () => {
     );
   }
 
-  return (
-    <Box p={8}>
-      <Flex justify="space-between" align="center" mb={6}>
-        <Heading>Staff Dashboard</Heading>
-        <Button colorScheme="gray" onClick={handleLogout}>Logout</Button>
-      </Flex>
+return (
+  <Box p={8} bg="gray.50" minH="100vh">
+    <Flex justify="space-between" align="center" mb={6}>
+      <Heading size="lg" color="teal.700">Staff Dashboard</Heading>
+      <Button colorScheme="gray" onClick={handleLogout}>Logout</Button>
+    </Flex>
 
-      <VStack spacing={3} align="start" mb={6}>
+    <Box mb={8} p={4} bg="white" boxShadow="md" borderRadius="md">
+      <Text fontWeight="bold" mb={4}>Submit Leave Request</Text>
+      <VStack spacing={4} align="stretch">
         <Input
           placeholder="Start Date"
           value={form.start_date}
@@ -136,22 +138,26 @@ const StaffDashboard = () => {
         />
         <Button colorScheme="teal" onClick={submitLeave}>Submit Leave</Button>
       </VStack>
+    </Box>
 
-      <Select
-        placeholder="Filter by status"
-        value={statusFilter}
-        onChange={(e) => setStatusFilter(e.target.value)}
-        mb={4}
-        maxW="300px"
-      >
-        <option value="all">All</option>
-        <option value="pending">Pending</option>
-        <option value="approved">Approved</option>
-        <option value="rejected">Rejected</option>
-      </Select>
+    <Box p={4} bg="white" boxShadow="md" borderRadius="md">
+      <Flex justify="space-between" align="center" mb={4}>
+        <Text fontWeight="bold">Your Leave Requests</Text>
+        <Select
+          placeholder="Filter by status"
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          maxW="300px"
+        >
+          <option value="all">All</option>
+          <option value="pending">Pending</option>
+          <option value="approved">Approved</option>
+          <option value="rejected">Rejected</option>
+        </Select>
+      </Flex>
 
-      <Table variant="simple">
-        <Thead>
+      <Table variant="striped" colorScheme="gray" size="sm">
+        <Thead bg="gray.100">
           <Tr>
             <Th>Start</Th>
             <Th>End</Th>
@@ -176,7 +182,7 @@ const StaffDashboard = () => {
                   {l.status === 'pending' && (
                     <Button
                       size="sm"
-                      colorScheme="red"
+                      colorScheme="orange"
                       onClick={() => cancelLeave(l.id)}
                     >
                       Cancel
@@ -189,7 +195,9 @@ const StaffDashboard = () => {
         </Tbody>
       </Table>
     </Box>
-  );
+  </Box>
+);
+
 };
 
 export default StaffDashboard;
