@@ -15,11 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import { loginUser } from '../api/auth';
 
 const Login = () => {
-  const [credentials, setCredentials] = useState({
-    email: '',
-    password: ''
-  });
-
+  const [credentials, setCredentials] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const toast = useToast();
   const navigate = useNavigate();
@@ -57,14 +53,7 @@ const Login = () => {
       justifyContent="center"
       px={4}
     >
-      <Box
-        bg="whiteAlpha.900"
-        p={8}
-        rounded="lg"
-        shadow="2xl"
-        maxW="md"
-        w="full"
-      >
+      <Box bg="whiteAlpha.900" p={8} rounded="lg" shadow="2xl" maxW="md" w="full">
         <VStack spacing={4}>
           <Image src="/logo.jpeg" alt="Ayateke Logo" boxSize="90px" />
           <Heading size="md" textAlign="center">
