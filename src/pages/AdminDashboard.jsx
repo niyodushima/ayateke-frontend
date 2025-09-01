@@ -90,15 +90,16 @@ const AdminDashboard = () => {
   }
 
   return (
-    <Box p={8}>
-      <Flex justify="space-between" align="center" mb={6}>
-        <Heading>Admin Dashboard</Heading>
-        <Button colorScheme="gray" onClick={handleLogout}>Logout</Button>
-      </Flex>
+  <Box p={8} bg="gray.50" minH="100vh">
+    <Flex justify="space-between" align="center" mb={6}>
+      <Heading size="lg" color="blue.700">Admin Dashboard</Heading>
+      <Button colorScheme="gray" onClick={handleLogout}>Logout</Button>
+    </Flex>
 
+    <Box mb={8} p={4} bg="white" boxShadow="md" borderRadius="md">
       <Text fontWeight="bold" mb={2}>Registered Users</Text>
-      <Table variant="simple" mb={6}>
-        <Thead>
+      <Table variant="striped" colorScheme="gray" size="sm">
+        <Thead bg="gray.100">
           <Tr>
             <Th>Email</Th>
             <Th>Role</Th>
@@ -113,8 +114,10 @@ const AdminDashboard = () => {
           ))}
         </Tbody>
       </Table>
+    </Box>
 
-      <Flex justify="space-between" align="center" mb={2}>
+    <Box p={4} bg="white" boxShadow="md" borderRadius="md">
+      <Flex justify="space-between" align="center" mb={4}>
         <Text fontWeight="bold">Leave Requests</Text>
         <Select
           placeholder="Filter by status"
@@ -129,8 +132,8 @@ const AdminDashboard = () => {
         </Select>
       </Flex>
 
-      <Table variant="simple">
-        <Thead>
+      <Table variant="striped" colorScheme="gray" size="sm">
+        <Thead bg="gray.100">
           <Tr>
             <Th>Employee</Th>
             <Th>Start</Th>
@@ -158,7 +161,7 @@ const AdminDashboard = () => {
                     <Flex gap={2}>
                       <Button
                         size="sm"
-                        colorScheme="green"
+                        colorScheme="blue"
                         onClick={() => updateLeaveStatus(l.id, 'approved')}
                       >
                         Approve
@@ -179,7 +182,8 @@ const AdminDashboard = () => {
         </Tbody>
       </Table>
     </Box>
-  );
+  </Box>
+);
 };
 
 export default AdminDashboard;
