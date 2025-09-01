@@ -11,7 +11,7 @@ export async function loginUser(credentials) {
       }),
     });
 
-    const data = await response.json(); // ✅ read once
+    const data = await response.json();
 
     if (!response.ok) {
       throw new Error(data.message || 'Login failed');
@@ -29,4 +29,3 @@ export async function loginUser(credentials) {
     throw error;
   }
 }
-
