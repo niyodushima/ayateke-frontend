@@ -33,7 +33,6 @@ const StaffDashboard = () => {
     try {
       const res = await fetch('http://localhost:5000/api/leaves');
       const data = await res.json();
-      console.log('Leaves API response:', data);
 
       const leaveArray = Array.isArray(data)
         ? data
@@ -61,14 +60,14 @@ const StaffDashboard = () => {
 
       const data = await res.json();
       if (res.ok) {
-        toast({ title: 'Leave submitted', status: 'success' });
+        toast({ title: 'Leave submitted', status: 'success', duration: 3000, isClosable: true });
         setForm({ start_date: '', end_date: '', reason: '' });
         fetchLeaves();
       } else {
-        toast({ title: data.message || 'Error', status: 'error' });
+        toast({ title: data.message || 'Error', status: 'error', duration: 3000, isClosable: true });
       }
     } catch (err) {
-      toast({ title: 'Server error', status: 'error' });
+      toast({ title: 'Server error', status: 'error', duration: 3000, isClosable: true });
     }
   };
 
@@ -79,13 +78,13 @@ const StaffDashboard = () => {
       });
 
       if (res.ok) {
-        toast({ title: 'Leave cancelled', status: 'info' });
+        toast({ title: 'Leave cancelled', status: 'info', duration: 3000, isClosable: true });
         fetchLeaves();
       } else {
-        toast({ title: 'Failed to cancel leave', status: 'error' });
+        toast({ title: 'Failed to cancel leave', status: 'error', duration: 3000, isClosable: true });
       }
     } catch (err) {
-      toast({ title: 'Server error', status: 'error' });
+      toast({ title: 'Server error', status: 'error', duration: 3000, isClosable: true });
     }
   };
 
@@ -111,93 +110,92 @@ const StaffDashboard = () => {
     );
   }
 
-return (
-  <Box p={8} bg="gray.50" minH="100vh">
-    <Flex justify="space-between" align="center" mb={6}>
-      <Heading size="lg" color="teal.700">Staff Dashboard</Heading>
-      <Button colorScheme="gray" onClick={handleLogout}>Logout</Button>
-    </Flex>
-
-    <Box mb={8} p={4} bg="white" boxShadow="md" borderRadius="md">
-      <Text fontWeight="bold" mb={4}>Submit Leave Request</Text>
-      <VStack spacing={4} align="stretch">
-        <Input
-          placeholder="Start Date"
-          value={form.start_date}
-          onChange={e => setForm({ ...form, start_date: e.target.value })}
-        />
-        <Input
-          placeholder="End Date"
-          value={form.end_date}
-          onChange={e => setForm({ ...form, end_date: e.target.value })}
-        />
-        <Input
-          placeholder="Reason"
-          value={form.reason}
-          onChange={e => setForm({ ...form, reason: e.target.value })}
-        />
-        <Button colorScheme="teal" onClick={submitLeave}>Submit Leave</Button>
-      </VStack>
-    </Box>
-
-    <Box p={4} bg="white" boxShadow="md" borderRadius="md">
-      <Flex justify="space-between" align="center" mb={4}>
-        <Text fontWeight="bold">Your Leave Requests</Text>
-        <Select
-          placeholder="Filter by status"
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          maxW="300px"
-        >
-          <option value="all">All</option>
-          <option value="pending">Pending</option>
-          <option value="approved">Approved</option>
-          <option value="rejected">Rejected</option>
-        </Select>
+  return (
+    <Box p={{ base: 4, md: 8 }} bg="gray.50" minH="100vh">
+      <Flex justify="space-between" align="center" mb={6} flexWrap="wrap" gap={4}>
+        <Heading size="lg" color="teal.700">Staff Dashboard</Heading>
+        <Button colorScheme="gray" onClick={handleLogout}>Logout</Button>
       </Flex>
 
-      <Table variant="striped" colorScheme="gray" size="sm">
-        <Thead bg="gray.100">
-          <Tr>
-            <Th>Start</Th>
-            <Th>End</Th>
-            <Th>Reason</Th>
-            <Th>Status</Th>
-            <Th>Action</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {filteredLeaves.length === 0 ? (
-            <Tr>
-              <Td colSpan={5} textAlign="center">No leave requests found.</Td>
-            </Tr>
-          ) : (
-            filteredLeaves.map((l, i) => (
-              <Tr key={i}>
-                <Td>{l.start_date}</Td>
-                <Td>{l.end_date}</Td>
-                <Td>{l.reason}</Td>
-                <Td>{l.status}</Td>
-                <Td>
-                  {l.status === 'pending' && (
-                    <Button
-                      size="sm"
-                      colorScheme="orange"
-                      onClick={() => cancelLeave(l.id)}
-                    >
-                      Cancel
-                    </Button>
-                  )}
-                </Td>
-              </Tr>
-            ))
-          )}
-        </Tbody>
-      </Table>
-    </Box>
-  </Box>
-);
+      <Box mb={8} p={4} bg="white" boxShadow="md" borderRadius="md">
+        <Text fontWeight="bold" mb={4}>Submit Leave Request</Text>
+        <VStack spacing={4} align="stretch">
+          <Input
+            placeholder="Start Date"
+            value={form.start_date}
+            onChange={e => setForm({ ...form, start_date: e.target.value })}
+          />
+          <Input
+            placeholder="End Date"
+            value={form.end_date}
+            onChange={e => setForm({ ...form, end_date: e.target.value })}
+          />
+          <Input
+            placeholder="Reason"
+            value={form.reason}
+            onChange={e => setForm({ ...form, reason: e.target.value })}
+          />
+          <Button colorScheme="teal" onClick={submitLeave}>Submit Leave</Button>
+        </VStack>
+      </Box>
 
+      <Box p={4} bg="white" boxShadow="md" borderRadius="md">
+        <Flex justify="space-between" align="center" mb={4} flexWrap="wrap" gap={4}>
+          <Text fontWeight="bold">Your Leave Requests</Text>
+          <Select
+            placeholder="Filter by status"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            maxW="300px"
+          >
+            <option value="all">All</option>
+            <option value="pending">Pending</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
+          </Select>
+        </Flex>
+
+        <Table variant="striped" colorScheme="gray" size="sm">
+          <Thead bg="gray.100">
+            <Tr>
+              <Th>Start</Th>
+              <Th>End</Th>
+              <Th>Reason</Th>
+              <Th>Status</Th>
+              <Th>Action</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {filteredLeaves.length === 0 ? (
+              <Tr>
+                <Td colSpan={5} textAlign="center">No leave requests found.</Td>
+              </Tr>
+            ) : (
+              filteredLeaves.map((l, i) => (
+                <Tr key={i}>
+                  <Td>{l.start_date}</Td>
+                  <Td>{l.end_date}</Td>
+                  <Td>{l.reason}</Td>
+                  <Td>{l.status}</Td>
+                  <Td>
+                    {l.status === 'pending' && (
+                      <Button
+                        size="sm"
+                        colorScheme="orange"
+                        onClick={() => cancelLeave(l.id)}
+                      >
+                        Cancel
+                      </Button>
+                    )}
+                  </Td>
+                </Tr>
+              ))
+            )}
+          </Tbody>
+        </Table>
+      </Box>
+    </Box>
+  );
 };
 
 export default StaffDashboard;
