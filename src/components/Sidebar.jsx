@@ -1,7 +1,15 @@
-import { Box, Flex, Text, VStack } from '@chakra-ui/react';
-import { NavLink } from 'react-router-dom';
-
-const userRole = 'hr'; // Replace with dynamic role later
+import {
+  Box,
+  Flex,
+  Text,
+  VStack,
+  IconButton,
+  useColorMode,
+  useColorModeValue,
+  Divider,
+} from '@chakra-ui/react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { MoonIcon, SunIcon } from '@chakra-ui/icons';
 
 const navItems = [
   { label: 'Dashboard', emoji: '🏠', path: '/admin/dashboard', roles: ['admin', 'hr', 'staff'] },
@@ -10,13 +18,40 @@ const navItems = [
 ];
 
 const Sidebar = () => {
+  const navigate = useNavigate();
+  const { colorMode, toggleColorMode } = useColorMode();
+  const bg = useColorModeValue('white', 'gray.900');
+  const activeBg = useColorModeValue('teal.50', 'teal.700');
+  const borderColor = useColorModeValue('teal', 'teal.300');
+
+  const user = JSON.parse(localStorage.getItem('user') || 'null');
+  const userRole = user?.role || 'staff';
+
   const visibleItems = navItems.filter(item => item.roles.includes(userRole));
 
   return (
-    <Box w="250px" bg="white" p={5} shadow="md" height="100vh">
-      <Text fontSize="xl" fontWeight="bold" mb={6} color="teal.600">
-        Ayateke HR
-      </Text>
+    <Box
+      w={{ base: 'full', md: '250px' }}
+      bg={bg}
+      p={5}
+      shadow="md"
+      height="100vh"
+      position="sticky"
+      top="0"
+      zIndex="10"
+    >
+      <Flex justify="space-between" align="center" mb={6}>
+        <Text fontSize="xl" fontWeight="bold" color="teal.600">
+          Ayateke HR
+        </Text>
+        <IconButton
+          icon={colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
+          onClick={toggleColorMode}
+          size="sm"
+          variant="ghost"
+          aria-label="Toggle theme"
+        />
+      </Flex>
 
       <VStack align="start" spacing={2}>
         {visibleItems.map((item, index) => (
@@ -28,10 +63,10 @@ const Sidebar = () => {
                 px={3}
                 py={2}
                 borderRadius="md"
-                bg={isActive ? 'teal.50' : 'transparent'}
+                bg={isActive ? activeBg : 'transparent'}
                 fontWeight={isActive ? 'bold' : 'normal'}
-                borderLeft={isActive ? '4px solid teal' : '4px solid transparent'}
-                _hover={{ bg: 'gray.100', cursor: 'pointer' }}
+                borderLeft={isActive ? `4px solid ${borderColor}` : '4px solid transparent'}
+                _hover={{ bg: useColorModeValue('gray.100', 'gray.700'), cursor: 'pointer' }}
                 transition="all 0.2s ease"
               >
                 <Text fontSize="lg">{item.emoji}</Text>
@@ -41,6 +76,22 @@ const Sidebar = () => {
           </NavLink>
         ))}
       </VStack>
+
+      <Divider my={6} />
+      <Flex
+        px={3}
+        py={2}
+        borderRadius="md"
+        _hover={{ bg: useColorModeValue('gray.100', 'gray.700'), cursor: 'pointer' }}
+        transition="all 0.2s ease"
+        onClick={() => {
+          localStorage.clear();
+          navigate('/');
+        }}
+      >
+        <Text fontSize="lg">🚪</Text>
+        <Text ml={3}>Logout</Text>
+      </Flex>
     </Box>
   );
 };
