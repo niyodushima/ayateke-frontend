@@ -20,8 +20,11 @@ const navItems = [
 const Sidebar = () => {
   const navigate = useNavigate();
   const { colorMode, toggleColorMode } = useColorMode();
+
+  // ✅ Hooks must be called at top level
   const bg = useColorModeValue('white', 'gray.900');
   const activeBg = useColorModeValue('teal.50', 'teal.700');
+  const hoverBg = useColorModeValue('gray.100', 'gray.700');
   const borderColor = useColorModeValue('teal', 'teal.300');
 
   const user = JSON.parse(localStorage.getItem('user') || 'null');
@@ -66,7 +69,7 @@ const Sidebar = () => {
                 bg={isActive ? activeBg : 'transparent'}
                 fontWeight={isActive ? 'bold' : 'normal'}
                 borderLeft={isActive ? `4px solid ${borderColor}` : '4px solid transparent'}
-                _hover={{ bg: useColorModeValue('gray.100', 'gray.700'), cursor: 'pointer' }}
+                _hover={{ bg: hoverBg, cursor: 'pointer' }}
                 transition="all 0.2s ease"
               >
                 <Text fontSize="lg">{item.emoji}</Text>
@@ -82,7 +85,7 @@ const Sidebar = () => {
         px={3}
         py={2}
         borderRadius="md"
-        _hover={{ bg: useColorModeValue('gray.100', 'gray.700'), cursor: 'pointer' }}
+        _hover={{ bg: hoverBg, cursor: 'pointer' }}
         transition="all 0.2s ease"
         onClick={() => {
           localStorage.clear();
