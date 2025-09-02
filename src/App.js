@@ -2,14 +2,26 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
 import StaffDashboard from './pages/StaffDashboard';
+import DashboardLayout from './layouts/DashboardLayout';
 
 function App() {
   return (
     <Router>
       <Routes>
+        {/* Public route */}
         <Route path="/" element={<Login />} />
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/staff" element={<StaffDashboard />} />
+
+        {/* Admin routes wrapped in layout */}
+        <Route path="/admin" element={<DashboardLayout />}>
+          <Route path="dashboard" element={<AdminDashboard />} />
+          {/* Add more admin subroutes here if needed */}
+        </Route>
+
+        {/* Staff routes wrapped in layout */}
+        <Route path="/staff" element={<DashboardLayout />}>
+          <Route index element={<StaffDashboard />} />
+          {/* Add more staff subroutes here if needed */}
+        </Route>
       </Routes>
     </Router>
   );
