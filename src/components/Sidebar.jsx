@@ -4,28 +4,30 @@ import {
   Text,
   VStack,
   IconButton,
+  Avatar,
+  Divider,
   useColorMode,
   useColorModeValue,
-  Divider,
 } from '@chakra-ui/react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { MoonIcon, SunIcon } from '@chakra-ui/icons';
+import { FaHome, FaUsers, FaCog, FaSignOutAlt } from 'react-icons/fa';
 
 const navItems = [
-  { label: 'Dashboard', emoji: '🏠', path: '/admin/dashboard', roles: ['admin', 'hr', 'staff'] },
-  { label: 'Staff Directory', emoji: '👥', path: '/admin/staff', roles: ['admin', 'hr'] },
-  { label: 'Settings', emoji: '⚙️', path: '/admin/settings', roles: ['admin'] },
+  { label: 'Dashboard', icon: FaHome, path: '/admin/dashboard', roles: ['admin', 'hr', 'staff'] },
+  { label: 'Staff Directory', icon: FaUsers, path: '/admin/staff', roles: ['admin', 'hr'] },
+  { label: 'Settings', icon: FaCog, path: '/admin/settings', roles: ['admin'] },
 ];
 
 const Sidebar = () => {
   const navigate = useNavigate();
   const { colorMode, toggleColorMode } = useColorMode();
 
-  // ✅ Hooks must be called at top level
   const bg = useColorModeValue('white', 'gray.900');
-  const activeBg = useColorModeValue('teal.50', 'teal.700');
+  const activeBg = useColorModeValue('teal.100', 'teal.700');
   const hoverBg = useColorModeValue('gray.100', 'gray.700');
-  const borderColor = useColorModeValue('teal', 'teal.300');
+  const borderColor = useColorModeValue('teal.500', 'teal.300');
+  const textColor = useColorModeValue('gray.800', 'white');
 
   const user = JSON.parse(localStorage.getItem('user') || 'null');
   const userRole = user?.role || 'staff';
@@ -43,6 +45,7 @@ const Sidebar = () => {
       top="0"
       zIndex="10"
     >
+      {/* Header */}
       <Flex justify="space-between" align="center" mb={6}>
         <Text fontSize="xl" fontWeight="bold" color="teal.600">
           Ayateke HR
@@ -56,6 +59,20 @@ const Sidebar = () => {
         />
       </Flex>
 
+      {/* User Info */}
+      <Flex align="center" gap={3} mb={6}>
+        <Avatar size="sm" name={user?.name || 'User'} />
+        <Box>
+          <Text fontWeight="medium" color={textColor}>
+            {user?.name || 'Staff'}
+          </Text>
+          <Text fontSize="sm" color="gray.500">
+            {userRole.charAt(0).toUpperCase() + userRole.slice(1)}
+          </Text>
+        </Box>
+      </Flex>
+
+      {/* Navigation */}
       <VStack align="start" spacing={2}>
         {visibleItems.map((item, index) => (
           <NavLink key={index} to={item.path}>
@@ -69,10 +86,11 @@ const Sidebar = () => {
                 bg={isActive ? activeBg : 'transparent'}
                 fontWeight={isActive ? 'bold' : 'normal'}
                 borderLeft={isActive ? `4px solid ${borderColor}` : '4px solid transparent'}
+                color={textColor}
                 _hover={{ bg: hoverBg, cursor: 'pointer' }}
                 transition="all 0.2s ease"
               >
-                <Text fontSize="lg">{item.emoji}</Text>
+                <Box as={item.icon} fontSize="lg" />
                 <Text>{item.label}</Text>
               </Flex>
             )}
@@ -81,10 +99,13 @@ const Sidebar = () => {
       </VStack>
 
       <Divider my={6} />
+
+      {/* Logout */}
       <Flex
         px={3}
         py={2}
         borderRadius="md"
+        color={textColor}
         _hover={{ bg: hoverBg, cursor: 'pointer' }}
         transition="all 0.2s ease"
         onClick={() => {
@@ -92,7 +113,7 @@ const Sidebar = () => {
           navigate('/');
         }}
       >
-        <Text fontSize="lg">🚪</Text>
+        <Box as={FaSignOutAlt} fontSize="lg" />
         <Text ml={3}>Logout</Text>
       </Flex>
     </Box>
