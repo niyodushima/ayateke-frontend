@@ -3,46 +3,45 @@ import {
   Spacer,
   Avatar,
   Text,
-  Box,
   IconButton,
-  useColorMode,
-  useColorModeValue,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
 } from '@chakra-ui/react';
-import { MoonIcon, SunIcon } from '@chakra-ui/icons';
+import { HamburgerIcon } from '@chakra-ui/icons';
 
 const rawUser = localStorage.getItem('user');
 const user = rawUser ? JSON.parse(rawUser) : null;
 
-const Navbar = () => {
-  const { colorMode, toggleColorMode } = useColorMode();
-  const bg = useColorModeValue('white', 'gray.800');
-  const textColor = useColorModeValue('gray.800', 'white');
+const Navbar = ({ onOpenSidebar }) => (
+  <Flex bg="white" p={4} shadow="sm" align="center">
+    {/* Hamburger for mobile */}
+    <IconButton
+      icon={<HamburgerIcon />}
+      display={{ base: 'inline-flex', md: 'none' }}
+      onClick={onOpenSidebar}
+      aria-label="Open menu"
+      mr={4}
+    />
 
-  return (
-    <Flex
-      bg={bg}
-      p={4}
-      shadow="sm"
-      align="center"
-      borderBottom="1px solid"
-      borderColor={useColorModeValue('gray.200', 'gray.700')}
-    >
-      <Text fontWeight="bold" fontSize="lg" color={textColor}>
-        Welcome, {user?.role === 'admin' ? 'Admin' : 'Staff'}
-      </Text>
-      <Spacer />
-      <Flex align="center" gap={4}>
-        <IconButton
-          icon={colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
-          onClick={toggleColorMode}
-          size="sm"
-          variant="ghost"
-          aria-label="Toggle theme"
-        />
-        <Avatar name={user?.name || 'User'} src={user?.avatar || ''} />
-      </Flex>
-    </Flex>
-  );
-};
+    <Text fontWeight="bold">Dashboard</Text>
+    <Spacer />
+
+    <Menu>
+      <MenuButton>
+        <Avatar name={user?.name || 'User'} />
+      </MenuButton>
+      <MenuList>
+        <MenuItem>Profile</MenuItem>
+        <MenuItem>Settings</MenuItem>
+        <MenuItem onClick={() => {
+          localStorage.clear();
+          window.location.href = '/';
+        }}>Logout</MenuItem>
+      </MenuList>
+    </Menu>
+  </Flex>
+);
 
 export default Navbar;
