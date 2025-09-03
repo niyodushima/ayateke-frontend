@@ -1,15 +1,14 @@
 import {
   Box,
   Flex,
-  IconButton,
   useDisclosure,
   Drawer,
   DrawerOverlay,
   DrawerContent,
   DrawerCloseButton,
+  useColorModeValue,
 } from '@chakra-ui/react';
 import { Outlet } from 'react-router-dom';
-import { HamburgerIcon } from '@chakra-ui/icons';
 import Sidebar from '../components/Sidebar';
 import Navbar from '../components/Navbar';
 
@@ -26,7 +25,7 @@ const DashboardLayout = () => {
       {/* Drawer for mobile */}
       <Drawer isOpen={isOpen} placement="left" onClose={onClose}>
         <DrawerOverlay />
-        <DrawerContent>
+        <DrawerContent bg={useColorModeValue('white', 'gray.900')}>
           <DrawerCloseButton />
           <Sidebar />
         </DrawerContent>
@@ -34,7 +33,9 @@ const DashboardLayout = () => {
 
       {/* Main content */}
       <Box flex="1" display="flex" flexDirection="column" bg="gray.50">
-        <Navbar onOpenSidebar={onOpen} />
+        <Box position="sticky" top="0" zIndex="20">
+          <Navbar onOpenSidebar={onOpen} />
+        </Box>
         <Box flex="1" overflowY="auto" p={6}>
           <Outlet />
         </Box>
