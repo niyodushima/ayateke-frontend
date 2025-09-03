@@ -7,7 +7,6 @@ import {
   Image,
   Text,
   VStack,
-  Flex,
   Divider,
 } from '@chakra-ui/react';
 import { useState } from 'react';
@@ -24,14 +23,15 @@ const Login = () => {
     setLoading(true);
     try {
       const data = await loginUser(credentials);
-      toast({ title: 'Login successful', status: 'success' });
+      toast({ title: 'Login successful', status: 'success', duration: 3000 });
 
-      localStorage.setItem('token', data.token);
+      localStorage.setItem('authToken', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
 
-      navigate(data.user.role === 'admin' ? '/admin' : '/staff');
+      const role = data.user.role;
+      navigate(role === 'admin' ? '/admin/dashboard' : '/staff');
     } catch (error) {
-      toast({ title: error.message, status: 'error' });
+      toast({ title: 'Login failed', description: error.message, status: 'error', duration: 4000 });
     } finally {
       setLoading(false);
     }
@@ -39,15 +39,11 @@ const Login = () => {
 
   return (
     <Box
-      position="absolute"
-      top={0}
-      left={0}
       w="100vw"
       h="100vh"
       bgImage="linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('/background.jpeg')"
       bgSize="cover"
       bgPosition="center"
-      bgRepeat="no-repeat"
       display="flex"
       alignItems="center"
       justifyContent="center"
@@ -56,9 +52,7 @@ const Login = () => {
       <Box bg="whiteAlpha.900" p={8} rounded="lg" shadow="2xl" maxW="md" w="full">
         <VStack spacing={4}>
           <Image src="/logo.jpeg" alt="Ayateke Logo" boxSize="90px" />
-          <Heading size="md" textAlign="center">
-            Ayateke Staff Management
-          </Heading>
+          <Heading size="md" textAlign="center">Ayateke Staff Management</Heading>
           <Text fontSize="sm" color="gray.600" textAlign="center">
             Delivering Sustainable Water Solutions Across Rwanda
           </Text>
@@ -66,17 +60,13 @@ const Login = () => {
           <Input
             placeholder="Email"
             value={credentials.email}
-            onChange={(e) =>
-              setCredentials({ ...credentials, email: e.target.value })
-            }
+            onChange={(e) => setCredentials({ ...credentials, email: e.target.value })}
           />
           <Input
             placeholder="Password"
             type="password"
             value={credentials.password}
-            onChange={(e) =>
-              setCredentials({ ...credentials, password: e.target.value })
-            }
+            onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
           />
 
           <Button
