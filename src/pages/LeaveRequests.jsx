@@ -12,16 +12,21 @@ import {
   Spinner,
   Text,
   useToast,
+  Center,
+  useColorModeValue,
 } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 
-// ✅ Use environment variable for backend URL
 const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 const LeaveRequests = () => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const toast = useToast();
+  const cardBg = useColorModeValue('white', 'gray.800');
+
+  const user = JSON.parse(localStorage.getItem('user') || 'null');
+  const userRole = user?.role || 'staff';
 
   useEffect(() => {
     const fetchRequests = async () => {
@@ -32,9 +37,7 @@ const LeaveRequests = () => {
           },
         });
 
-        if (!res.ok) {
-          throw new Error(`Server responded with ${res.status}`);
-        }
+        if (!res.ok) throw new Error(`Server responded with ${res.status}`);
 
         const data = await res.json();
         setRequests(data);
@@ -56,6 +59,9 @@ const LeaveRequests = () => {
   }, []);
 
   const updateStatus = async (id, newStatus) => {
+    const confirm = window.confirm(`Are you sure you want to ${newStatus.toLowerCase()} this request?`);
+    if (!confirm) return;
+
     try {
       const res = await fetch(`${BASE_URL}/api/leaves/${id}/status`, {
         method: 'PUT',
@@ -91,14 +97,19 @@ const LeaveRequests = () => {
   };
 
   return (
-    <Box p={6}>
+    <Box p={6} bg={cardBg} rounded="md" shadow="md">
       <Heading mb={4}>Leave Requests</Heading>
+
       {loading ? (
-        <Spinner />
+        <Center py={10}>
+          <Spinner size="lg" />
+        </Center>
       ) : requests.length === 0 ? (
-        <Text>No leave requests found.</Text>
+        <Text textAlign="center" color="gray.500">
+          No leave requests found.
+        </Text>
       ) : (
-        <Table variant="simple">
+        <Table variant="striped" colorScheme="gray" size="sm">
           <Thead>
             <Tr>
               <Th>Employee</Th>
@@ -106,7 +117,7 @@ const LeaveRequests = () => {
               <Th>From</Th>
               <Th>To</Th>
               <Th>Status</Th>
-              <Th>Action</Th>
+              {['admin', 'hr'].includes(userRole) && <Th>Action</Th>}
             </Tr>
           </Thead>
           <Tbody>
@@ -129,27 +140,29 @@ const LeaveRequests = () => {
                     {req.status}
                   </Badge>
                 </Td>
-                <Td>
-                  {req.status === 'Pending' && (
-                    <>
-                      <Button
-                        size="sm"
-                        colorScheme="green"
-                        mr={2}
-                        onClick={() => updateStatus(req.id, 'Approved')}
-                      >
-                        Approve
-                      </Button>
-                      <Button
-                        size="sm"
-                        colorScheme="red"
-                        onClick={() => updateStatus(req.id, 'Rejected')}
-                      >
-                        Reject
-                      </Button>
-                    </>
-                  )}
-                </Td>
+                {['admin', 'hr'].includes(userRole) && (
+                  <Td>
+                    {req.status === 'Pending' && (
+                      <>
+                        <Button
+                          size="xs"
+                          colorScheme="green"
+                          mr={2}
+                          onClick={() => updateStatus(req.id, 'Approved')}
+                        >
+                          Approve
+                        </Button>
+                        <Button
+                          size="xs"
+                          colorScheme="red"
+                          onClick={() => updateStatus(req.id, 'Rejected')}
+                        >
+                          Reject
+                        </Button>
+                      </>
+                    )}
+                  </Td>
+                )}
               </Tr>
             ))}
           </Tbody>
