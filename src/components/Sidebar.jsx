@@ -10,14 +10,23 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { MoonIcon, SunIcon } from '@chakra-ui/icons';
-import { FaHome, FaUsers, FaCog, FaSignOutAlt } from 'react-icons/fa';
-
-const navItems = [
-  { label: 'Dashboard', icon: FaHome, path: '/admin/dashboard', roles: ['admin', 'hr', 'staff'] },
-  { label: 'Staff Directory', icon: FaUsers, path: '/admin/staff', roles: ['admin', 'hr'] },
-  { label: 'Settings', icon: FaCog, path: '/admin/settings', roles: ['admin'] },
-];
+import {
+  MoonIcon,
+  SunIcon,
+} from '@chakra-ui/icons';
+import {
+  FaHome,
+  FaUsers,
+  FaCog,
+  FaSignOutAlt,
+  FaFileContract,
+  FaMoneyBillWave,
+  FaCalendarAlt,
+  FaEdit,
+  FaCalendarCheck,
+  FaFileAlt,
+  FaMoneyCheckAlt,
+} from 'react-icons/fa';
 
 const Sidebar = () => {
   const navigate = useNavigate();
@@ -32,7 +41,24 @@ const Sidebar = () => {
   const user = JSON.parse(localStorage.getItem('user') || 'null');
   const userRole = user?.role || 'staff';
 
-  const visibleItems = navItems.filter(item => item.roles.includes(userRole));
+  const adminNav = [
+    { label: 'Dashboard', icon: FaHome, path: '/admin/dashboard' },
+    { label: 'Staff Directory', icon: FaUsers, path: '/admin/staff' },
+    { label: 'Contracts', icon: FaFileContract, path: '/admin/contracts' },
+    { label: 'Payroll', icon: FaMoneyBillWave, path: '/admin/payroll' },
+    { label: 'Leave Requests', icon: FaCalendarAlt, path: '/admin/leaves' },
+    { label: 'Settings', icon: FaCog, path: '/admin/settings' },
+  ];
+
+  const staffNav = [
+    { label: 'Dashboard', icon: FaHome, path: '/staff' },
+    { label: 'Submit Leave', icon: FaEdit, path: '/staff/leave-request' },
+    { label: 'My Leave History', icon: FaCalendarCheck, path: '/staff/leaves' },
+    { label: 'My Contract', icon: FaFileAlt, path: '/staff/contract' },
+    { label: 'My Payslip', icon: FaMoneyCheckAlt, path: '/staff/payslip' },
+  ];
+
+  const visibleItems = userRole === 'admin' ? adminNav : staffNav;
 
   return (
     <Box
