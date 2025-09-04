@@ -8,6 +8,9 @@ import {
   Box,
   Text,
   Spinner,
+  Badge,
+  Avatar,
+  Flex,
 } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -29,12 +32,18 @@ const StaffTable = () => {
   }, []);
 
   if (loading) {
-    return <Spinner size="lg" />;
+    return (
+      <Box textAlign="center" py={10}>
+        <Spinner size="xl" />
+        <Text mt={4}>Loading staff directory...</Text>
+      </Box>
+    );
   }
 
   return (
-    <Box overflowX="auto">
-      <Table variant="simple" size="md">
+    <Box overflowX="auto" bg="white" p={4} rounded="md" shadow="md">
+      <Text fontWeight="bold" mb={4}>Staff Directory</Text>
+      <Table variant="striped" colorScheme="gray" size="sm">
         <Thead>
           <Tr>
             <Th>Name</Th>
@@ -45,8 +54,15 @@ const StaffTable = () => {
         <Tbody>
           {staff.map((person) => (
             <Tr key={person.id}>
-              <Td>{person.name}</Td>
-              <Td>{person.role}</Td>
+              <Td>
+                <Flex align="center" gap={3}>
+                  <Avatar size="sm" name={person.name} />
+                  <Text>{person.name}</Text>
+                </Flex>
+              </Td>
+              <Td>
+                <Badge colorScheme="teal">{person.role}</Badge>
+              </Td>
               <Td>{person.department}</Td>
             </Tr>
           ))}
