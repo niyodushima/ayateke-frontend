@@ -38,10 +38,6 @@ const Sidebar = () => {
   const activeBg = useColorModeValue('teal.50', 'teal.700');
   const hoverBg = useColorModeValue('gray.100', 'gray.700');
   const borderColor = useColorModeValue('teal', 'teal.300');
-  const bg = useColorModeValue('white', 'gray.900');
-  const activeBg = useColorModeValue('teal.100', 'teal.700');
-  const hoverBg = useColorModeValue('gray.100', 'gray.700');
-  const borderColor = useColorModeValue('teal.500', 'teal.300');
   const textColor = useColorModeValue('gray.800', 'white');
  
 
