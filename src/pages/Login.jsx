@@ -8,13 +8,17 @@ import {
   Text,
   VStack,
   Divider,
+  InputGroup,
+  InputRightElement,
 } from '@chakra-ui/react';
+import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loginUser } from '../api/auth';
 
 const Login = () => {
   const [credentials, setCredentials] = useState({ email: '', password: '' });
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const toast = useToast();
   const navigate = useNavigate();
@@ -62,12 +66,24 @@ const Login = () => {
             value={credentials.email}
             onChange={(e) => setCredentials({ ...credentials, email: e.target.value })}
           />
-          <Input
-            placeholder="Password"
-            type="password"
-            value={credentials.password}
-            onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
-          />
+
+          <InputGroup>
+            <Input
+              placeholder="Password"
+              type={showPassword ? 'text' : 'password'}
+              value={credentials.password}
+              onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
+            />
+            <InputRightElement>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <ViewOffIcon /> : <ViewIcon />}
+              </Button>
+            </InputRightElement>
+          </InputGroup>
 
           <Button
             colorScheme="teal"
