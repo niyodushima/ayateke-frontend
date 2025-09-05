@@ -122,7 +122,71 @@ const StaffDashboard = () => {
             onChange={e => setForm({ ...form, end_date: e.target.value })}
           />
           <Input
-  placeholder="Reason"
-  value={form.reason}
-  onChange={(e) => setForm({ ...form, reason: e.target.value })}
-/>
+            placeholder="Reason"
+            value={form.reason}
+            onChange={(e) => setForm({ ...form, reason: e.target.value })}
+          />
+          <Button colorScheme="teal" onClick={submitLeave}>Submit Leave</Button>
+        </VStack>
+      </Box>
+
+      <Box p={4} bg="white" boxShadow="md" borderRadius="md">
+        <Flex justify="space-between" align="center" mb={4} flexWrap="wrap" gap={4}>
+          <Text fontWeight="bold">Your Leave Requests</Text>
+          <Select
+            placeholder="Filter by status"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            maxW="300px"
+          >
+            <option value="all">All</option>
+            <option value="pending">Pending</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
+          </Select>
+        </Flex>
+
+        <Table variant="striped" colorScheme="gray" size="sm">
+          <Thead bg="gray.100">
+            <Tr>
+              <Th>Start</Th>
+              <Th>End</Th>
+              <Th>Reason</Th>
+              <Th>Status</Th>
+              <Th>Action</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {filteredLeaves.length === 0 ? (
+              <Tr>
+                <Td colSpan={5} textAlign="center">No leave requests found.</Td>
+              </Tr>
+            ) : (
+              filteredLeaves.map((l, i) => (
+                <Tr key={i}>
+                  <Td>{l.start_date}</Td>
+                  <Td>{l.end_date}</Td>
+                  <Td>{l.reason}</Td>
+                  <Td>{l.status}</Td>
+                  <Td>
+                    {l.status === 'pending' && (
+                      <Button
+                        size="sm"
+                        colorScheme="orange"
+                        onClick={() => cancelLeave(l.id)}
+                      >
+                        Cancel
+                      </Button>
+                    )}
+                  </Td>
+                </Tr>
+              ))
+            )}
+          </Tbody>
+        </Table>
+      </Box>
+    </Box>
+  );
+};
+
+export default StaffDashboard;
