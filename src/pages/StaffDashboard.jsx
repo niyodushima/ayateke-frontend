@@ -122,6 +122,7 @@ const StaffDashboard = () => {
             onChange={e => setForm({ ...form, end_date: e.target.value })}
           />
           <Input
-            placeholder="Reason"
-            value={form.reason}
-            onChange
+  placeholder="Reason"
+  value={form.reason}
+  onChange={(e) => setForm({ ...form, reason: e.target.value })}
+/>
