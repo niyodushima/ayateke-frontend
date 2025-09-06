@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import {
   Box,
   Heading,
@@ -13,8 +12,14 @@ import {
   Select,
   useToast,
   Spinner,
-  Flex
+  Flex,
+  Stat,
+  StatLabel,
+  StatNumber,
+  SimpleGrid,
+  Divider,
 } from '@chakra-ui/react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const AdminDashboard = () => {
@@ -80,6 +85,10 @@ const AdminDashboard = () => {
     statusFilter === 'all' ? true : l.status === statusFilter
   );
 
+  const pendingLeaves = leaves.filter(l => l.status === 'pending').length;
+  const approvedLeaves = leaves.filter(l => l.status === 'approved').length;
+  const rejectedLeaves = leaves.filter(l => l.status === 'rejected').length;
+
   if (loading) {
     return (
       <Box p={8} textAlign="center">
@@ -96,6 +105,25 @@ const AdminDashboard = () => {
         <Button colorScheme="gray" onClick={handleLogout}>Logout</Button>
       </Flex>
 
+      {/* KPI Cards */}
+      <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6} mb={8}>
+        <Stat p={4} bg="white" shadow="md" borderRadius="md">
+          <StatLabel>Total Users</StatLabel>
+          <StatNumber>{users.length}</StatNumber>
+        </Stat>
+        <Stat p={4} bg="white" shadow="md" borderRadius="md">
+          <StatLabel>Pending Leaves</StatLabel>
+          <StatNumber>{pendingLeaves}</StatNumber>
+        </Stat>
+        <Stat p={4} bg="white" shadow="md" borderRadius="md">
+          <StatLabel>Approved Leaves</StatLabel>
+          <StatNumber>{approvedLeaves}</StatNumber>
+        </Stat>
+      </SimpleGrid>
+
+      <Divider mb={6} />
+
+      {/* Users Table */}
       <Box mb={8} p={4} bg="white" boxShadow="md" borderRadius="md">
         <Text fontWeight="bold" mb={2}>Registered Users</Text>
         <Table variant="striped" colorScheme="gray" size="sm">
@@ -116,6 +144,7 @@ const AdminDashboard = () => {
         </Table>
       </Box>
 
+      {/* Leave Requests Table */}
       <Box p={4} bg="white" boxShadow="md" borderRadius="md">
         <Flex justify="space-between" align="center" mb={4} flexWrap="wrap" gap={4}>
           <Text fontWeight="bold">Leave Requests</Text>
