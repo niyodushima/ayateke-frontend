@@ -15,6 +15,11 @@ import {
   Text,
   Select,
   Flex,
+  Stat,
+  StatLabel,
+  StatNumber,
+  SimpleGrid,
+  Divider,
 } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -27,7 +32,9 @@ const StaffDashboard = () => {
   const toast = useToast();
   const navigate = useNavigate();
 
-  const email = JSON.parse(localStorage.getItem('user') || 'null')?.email;
+  const user = JSON.parse(localStorage.getItem('user') || 'null');
+  const email = user?.email || '';
+  const name = user?.name || 'Staff';
 
   const fetchLeaves = async () => {
     try {
@@ -90,6 +97,10 @@ const StaffDashboard = () => {
     statusFilter === 'all' ? true : l.status === statusFilter
   );
 
+  const pendingCount = leaves.filter(l => l.status === 'pending').length;
+  const approvedCount = leaves.filter(l => l.status === 'approved').length;
+  const lastLeave = leaves[leaves.length - 1];
+
   if (loading) {
     return (
       <Box p={8} textAlign="center">
@@ -102,12 +113,31 @@ const StaffDashboard = () => {
   return (
     <Box p={{ base: 4, md: 8 }} bg="gray.50" minH="100vh">
       <Flex justify="space-between" align="center" mb={6} flexWrap="wrap" gap={4}>
-        <Heading size="lg" color="teal.700">Staff Dashboard</Heading>
+        <Heading size="lg" color="teal.700">Welcome, {name}</Heading>
         <Button colorScheme="gray" onClick={() => { localStorage.clear(); navigate('/'); }}>
           Logout
         </Button>
       </Flex>
 
+      {/* Quick Stats */}
+      <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6} mb={8}>
+        <Stat p={4} bg="white" shadow="md" borderRadius="md">
+          <StatLabel>Pending Requests</StatLabel>
+          <StatNumber>{pendingCount}</StatNumber>
+        </Stat>
+        <Stat p={4} bg="white" shadow="md" borderRadius="md">
+          <StatLabel>Approved Leaves</StatLabel>
+          <StatNumber>{approvedCount}</StatNumber>
+        </Stat>
+        <Stat p={4} bg="white" shadow="md" borderRadius="md">
+          <StatLabel>Last Request Status</StatLabel>
+          <StatNumber>{lastLeave?.status || 'N/A'}</StatNumber>
+        </Stat>
+      </SimpleGrid>
+
+      <Divider mb={6} />
+
+      {/* Leave Request Form */}
       <Box mb={8} p={4} bg="white" boxShadow="md" borderRadius="md">
         <Text fontWeight="bold" mb={4}>Submit Leave Request</Text>
         <VStack spacing={4} align="stretch">
@@ -130,9 +160,10 @@ const StaffDashboard = () => {
         </VStack>
       </Box>
 
+      {/* Leave History Table */}
       <Box p={4} bg="white" boxShadow="md" borderRadius="md">
         <Flex justify="space-between" align="center" mb={4} flexWrap="wrap" gap={4}>
-          <Text fontWeight="bold">Your Leave Requests</Text>
+          <Text fontWeight="bold">Your Leave History</Text>
           <Select
             placeholder="Filter by status"
             value={statusFilter}
