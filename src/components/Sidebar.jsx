@@ -26,20 +26,18 @@ import {
   FaCalendarCheck,
   FaFileAlt,
   FaMoneyCheckAlt,
+  FaUserCircle,
 } from 'react-icons/fa';
 
-const Sidebar = () => {
+const Sidebar = ({ currentPath, onClose }) => {
   const navigate = useNavigate();
   const { colorMode, toggleColorMode } = useColorMode();
 
-
-  // ✅ Hooks must be called at top level
   const bg = useColorModeValue('white', 'gray.900');
   const activeBg = useColorModeValue('teal.50', 'teal.700');
   const hoverBg = useColorModeValue('gray.100', 'gray.700');
   const borderColor = useColorModeValue('teal', 'teal.300');
   const textColor = useColorModeValue('gray.800', 'white');
- 
 
   const user = JSON.parse(localStorage.getItem('user') || 'null');
   const userRole = user?.role || 'staff';
@@ -57,8 +55,7 @@ const Sidebar = () => {
     { label: 'Dashboard', icon: FaHome, path: '/staff' },
     { label: 'Submit Leave', icon: FaEdit, path: '/staff/leave-request' },
     { label: 'My Leave History', icon: FaCalendarCheck, path: '/staff/leaves' },
-    { label: 'My Contract', icon: FaFileAlt, path: '/staff/contract' },
-    { label: 'My Payslip', icon: FaMoneyCheckAlt, path: '/staff/payslip' },
+    { label: 'Profile', icon: FaUserCircle, path: '/staff/profile' }, // ✅ New working link
   ];
 
   const visibleItems = userRole === 'admin' ? adminNav : staffNav;
@@ -104,7 +101,7 @@ const Sidebar = () => {
       {/* Navigation */}
       <VStack align="start" spacing={2}>
         {visibleItems.map((item, index) => (
-          <NavLink key={index} to={item.path}>
+          <NavLink key={index} to={item.path} onClick={onClose}>
             {({ isActive }) => (
               <Flex
                 align="center"
@@ -115,9 +112,7 @@ const Sidebar = () => {
                 bg={isActive ? activeBg : 'transparent'}
                 fontWeight={isActive ? 'bold' : 'normal'}
                 borderLeft={isActive ? `4px solid ${borderColor}` : '4px solid transparent'}
-
                 color={textColor}
-
                 _hover={{ bg: hoverBg, cursor: 'pointer' }}
                 transition="all 0.2s ease"
               >
@@ -136,10 +131,7 @@ const Sidebar = () => {
         px={3}
         py={2}
         borderRadius="md"
-        HEAD
-
         color={textColor}
-
         _hover={{ bg: hoverBg, cursor: 'pointer' }}
         transition="all 0.2s ease"
         onClick={() => {
