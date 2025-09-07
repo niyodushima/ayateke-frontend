@@ -2,8 +2,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
 import StaffDashboard from './pages/StaffDashboard';
-import StaffTraining from './pages/StaffTraining'; // ✅ moved to pages for consistency
-import StaffProfile from './pages/StaffProfile';   // ✅ moved to pages for consistency
+import StaffTraining from './components/StaffTraining'; // ✅ moved to pages for consistency
+import StaffProfile from './components/StaffProfile';   // ✅ moved to pages for consistency
 import DashboardLayout from './layouts/DashboardLayout';
 import AdminTrainingDashboard from './pages/AdminTrainingDashboard';
 
