@@ -18,6 +18,9 @@ import {
   StatNumber,
   SimpleGrid,
   Divider,
+  Card,
+  CardBody,
+  Badge
 } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -41,8 +44,8 @@ const AdminDashboard = () => {
       const leaveArray = Array.isArray(leavesData)
         ? leavesData
         : Array.isArray(leavesData.data)
-          ? leavesData.data
-          : [];
+        ? leavesData.data
+        : [];
       setLeaves(leaveArray);
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
@@ -87,7 +90,6 @@ const AdminDashboard = () => {
 
   const pendingLeaves = leaves.filter(l => l.status === 'pending').length;
   const approvedLeaves = leaves.filter(l => l.status === 'approved').length;
-  const rejectedLeaves = leaves.filter(l => l.status === 'rejected').length;
 
   if (loading) {
     return (
@@ -102,32 +104,44 @@ const AdminDashboard = () => {
     <Box p={{ base: 4, md: 8 }} bg="gray.50" minH="100vh">
       <Flex justify="space-between" align="center" mb={6} flexWrap="wrap" gap={4}>
         <Heading size="lg" color="blue.700">Admin Dashboard</Heading>
-        <Button colorScheme="gray" onClick={handleLogout}>Logout</Button>
+        <Button variant="outline" colorScheme="red" onClick={handleLogout}>Logout</Button>
       </Flex>
 
       {/* KPI Cards */}
       <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6} mb={8}>
-        <Stat p={4} bg="white" shadow="md" borderRadius="md">
-          <StatLabel>Total Users</StatLabel>
-          <StatNumber>{users.length}</StatNumber>
-        </Stat>
-        <Stat p={4} bg="white" shadow="md" borderRadius="md">
-          <StatLabel>Pending Leaves</StatLabel>
-          <StatNumber>{pendingLeaves}</StatNumber>
-        </Stat>
-        <Stat p={4} bg="white" shadow="md" borderRadius="md">
-          <StatLabel>Approved Leaves</StatLabel>
-          <StatNumber>{approvedLeaves}</StatNumber>
-        </Stat>
+        <Card _hover={{ transform: 'scale(1.02)', transition: '0.2s' }}>
+          <CardBody>
+            <Stat>
+              <StatLabel>Total Users</StatLabel>
+              <StatNumber>{users.length}</StatNumber>
+            </Stat>
+          </CardBody>
+        </Card>
+        <Card _hover={{ transform: 'scale(1.02)', transition: '0.2s' }}>
+          <CardBody>
+            <Stat>
+              <StatLabel>Pending Leaves</StatLabel>
+              <StatNumber>{pendingLeaves}</StatNumber>
+            </Stat>
+          </CardBody>
+        </Card>
+        <Card _hover={{ transform: 'scale(1.02)', transition: '0.2s' }}>
+          <CardBody>
+            <Stat>
+              <StatLabel>Approved Leaves</StatLabel>
+              <StatNumber>{approvedLeaves}</StatNumber>
+            </Stat>
+          </CardBody>
+        </Card>
       </SimpleGrid>
 
       <Divider mb={6} />
 
       {/* Users Table */}
-      <Box mb={8} p={4} bg="white" boxShadow="md" borderRadius="md">
+      <Box mb={8} p={6} bg="white" boxShadow="md" borderRadius="md" overflowX="auto">
         <Text fontWeight="bold" mb={2}>Registered Users</Text>
         <Table variant="striped" colorScheme="gray" size="sm">
-          <Thead bg="gray.100">
+          <Thead bg="gray.100" position="sticky" top={0} zIndex={1}>
             <Tr>
               <Th>Email</Th>
               <Th>Role</Th>
@@ -137,7 +151,11 @@ const AdminDashboard = () => {
             {users.map((u, i) => (
               <Tr key={i}>
                 <Td>{u.email}</Td>
-                <Td>{u.role}</Td>
+                <Td>
+                  <Badge colorScheme={u.role === 'admin' ? 'purple' : 'blue'}>
+                    {u.role}
+                  </Badge>
+                </Td>
               </Tr>
             ))}
           </Tbody>
@@ -145,11 +163,10 @@ const AdminDashboard = () => {
       </Box>
 
       {/* Leave Requests Table */}
-      <Box p={4} bg="white" boxShadow="md" borderRadius="md">
+      <Box p={6} bg="white" boxShadow="md" borderRadius="md" overflowX="auto">
         <Flex justify="space-between" align="center" mb={4} flexWrap="wrap" gap={4}>
           <Text fontWeight="bold">Leave Requests</Text>
           <Select
-            placeholder="Filter by status"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
             maxW="300px"
@@ -162,7 +179,7 @@ const AdminDashboard = () => {
         </Flex>
 
         <Table variant="striped" colorScheme="gray" size="sm">
-          <Thead bg="gray.100">
+          <Thead bg="gray.100" position="sticky" top={0} zIndex={1}>
             <Tr>
               <Th>Employee</Th>
               <Th>Start</Th>
@@ -184,7 +201,14 @@ const AdminDashboard = () => {
                   <Td>{l.start_date}</Td>
                   <Td>{l.end_date}</Td>
                   <Td>{l.reason}</Td>
-                  <Td>{l.status}</Td>
+                  <Td>
+                    <Badge colorScheme={
+                      l.status === 'approved' ? 'green' :
+                      l.status === 'pending' ? 'orange' : 'red'
+                    }>
+                      {l.status}
+                    </Badge>
+                  </Td>
                   <Td>
                     {l.status === 'pending' && (
                       <Flex gap={2}>
