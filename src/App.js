@@ -4,6 +4,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import StaffDashboard from './pages/StaffDashboard';
 import StaffTraining from './components/StaffTraining';
 import DashboardLayout from './layouts/DashboardLayout';
+import AdminTrainingDashboard from './pages/AdminTrainingDashboard';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         {/* Admin routes wrapped in layout */}
         <Route path="/admin" element={<DashboardLayout />}>
           <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="training" element={<AdminTrainingDashboard />} />
           {/* Add more admin subroutes here if needed */}
         </Route>
 
