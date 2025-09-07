@@ -3,7 +3,7 @@ import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
 import StaffDashboard from './pages/StaffDashboard';
 import StaffTraining from './components/StaffTraining';
-import StaffProfile from './pages/StaffProfile';
+import StaffProfile from './components/StaffProfile';
 import DashboardLayout from './layouts/DashboardLayout';
 import AdminTrainingDashboard from './pages/AdminTrainingDashboard';
 
