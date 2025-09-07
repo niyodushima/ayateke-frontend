@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
 import StaffDashboard from './pages/StaffDashboard';
-import StaffTraining from './pages/StaffTraining';
+import StaffTraining from './components/StaffTraining';
 import DashboardLayout from './layouts/DashboardLayout';
 
 function App() {
