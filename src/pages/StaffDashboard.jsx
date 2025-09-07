@@ -20,6 +20,8 @@ import {
   StatNumber,
   SimpleGrid,
   Divider,
+  Card,
+  CardBody,
 } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -44,7 +46,6 @@ const StaffDashboard = () => {
       const filtered = leaveArray.filter(l => l.employee_id === email);
       setLeaves(filtered);
     } catch (err) {
-      console.error('Error fetching leaves:', err);
       toast({ title: 'Failed to load leaves', status: 'error' });
     } finally {
       setLoading(false);
@@ -67,7 +68,7 @@ const StaffDashboard = () => {
       } else {
         toast({ title: data.message || 'Error submitting leave', status: 'error' });
       }
-    } catch (err) {
+    } catch {
       toast({ title: 'Server error', status: 'error' });
     }
   };
@@ -84,7 +85,7 @@ const StaffDashboard = () => {
       } else {
         toast({ title: 'Failed to cancel leave', status: 'error' });
       }
-    } catch (err) {
+    } catch {
       toast({ title: 'Server error', status: 'error' });
     }
   };
@@ -114,62 +115,57 @@ const StaffDashboard = () => {
     <Box p={{ base: 4, md: 8 }} bg="gray.50" minH="100vh">
       <Flex justify="space-between" align="center" mb={6} flexWrap="wrap" gap={4}>
         <Heading size="lg" color="teal.700">Welcome, {name}</Heading>
-        <Button colorScheme="gray" onClick={() => { localStorage.clear(); navigate('/'); }}>
+        <Button variant="outline" colorScheme="red" onClick={() => { localStorage.clear(); navigate('/'); }}>
           Logout
         </Button>
       </Flex>
 
       {/* Quick Stats */}
       <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6} mb={8}>
-        <Stat p={4} bg="white" shadow="md" borderRadius="md">
-          <StatLabel>Pending Requests</StatLabel>
-          <StatNumber>{pendingCount}</StatNumber>
-        </Stat>
-        <Stat p={4} bg="white" shadow="md" borderRadius="md">
-          <StatLabel>Approved Leaves</StatLabel>
-          <StatNumber>{approvedCount}</StatNumber>
-        </Stat>
-        <Stat p={4} bg="white" shadow="md" borderRadius="md">
-          <StatLabel>Last Request Status</StatLabel>
-          <StatNumber>{lastLeave?.status || 'N/A'}</StatNumber>
-        </Stat>
+        <Card _hover={{ transform: 'scale(1.02)', transition: '0.2s' }}>
+          <CardBody>
+            <Stat>
+              <StatLabel>Pending Requests</StatLabel>
+              <StatNumber>{pendingCount}</StatNumber>
+            </Stat>
+          </CardBody>
+        </Card>
+        <Card _hover={{ transform: 'scale(1.02)', transition: '0.2s' }}>
+          <CardBody>
+            <Stat>
+              <StatLabel>Approved Leaves</StatLabel>
+              <StatNumber>{approvedCount}</StatNumber>
+            </Stat>
+          </CardBody>
+        </Card>
+        <Card _hover={{ transform: 'scale(1.02)', transition: '0.2s' }}>
+          <CardBody>
+            <Stat>
+              <StatLabel>Last Request Status</StatLabel>
+              <StatNumber>{lastLeave?.status || 'N/A'}</StatNumber>
+            </Stat>
+          </CardBody>
+        </Card>
       </SimpleGrid>
 
       <Divider mb={6} />
 
       {/* Leave Request Form */}
-      <Box mb={8} p={4} bg="white" boxShadow="md" borderRadius="md">
+      <Box mb={8} p={6} bg="white" boxShadow="md" borderRadius="md">
         <Text fontWeight="bold" mb={4}>Submit Leave Request</Text>
         <VStack spacing={4} align="stretch">
-          <Input
-            type="date"
-            value={form.start_date}
-            onChange={e => setForm({ ...form, start_date: e.target.value })}
-          />
-          <Input
-            type="date"
-            value={form.end_date}
-            onChange={e => setForm({ ...form, end_date: e.target.value })}
-          />
-          <Input
-            placeholder="Reason"
-            value={form.reason}
-            onChange={(e) => setForm({ ...form, reason: e.target.value })}
-          />
+          <Input type="date" value={form.start_date} onChange={e => setForm({ ...form, start_date: e.target.value })} />
+          <Input type="date" value={form.end_date} onChange={e => setForm({ ...form, end_date: e.target.value })} />
+          <Input placeholder="Reason" value={form.reason} onChange={(e) => setForm({ ...form, reason: e.target.value })} />
           <Button colorScheme="teal" onClick={submitLeave}>Submit Leave</Button>
         </VStack>
       </Box>
 
       {/* Leave History Table */}
-      <Box p={4} bg="white" boxShadow="md" borderRadius="md">
+      <Box p={6} bg="white" boxShadow="md" borderRadius="md" overflowX="auto">
         <Flex justify="space-between" align="center" mb={4} flexWrap="wrap" gap={4}>
           <Text fontWeight="bold">Your Leave History</Text>
-          <Select
-            placeholder="Filter by status"
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            maxW="300px"
-          >
+          <Select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} maxW="300px">
             <option value="all">All</option>
             <option value="pending">Pending</option>
             <option value="approved">Approved</option>
@@ -178,7 +174,7 @@ const StaffDashboard = () => {
         </Flex>
 
         <Table variant="striped" colorScheme="gray" size="sm">
-          <Thead bg="gray.100">
+          <Thead position="sticky" top={0} bg="gray.100" zIndex={1}>
             <Tr>
               <Th>Start</Th>
               <Th>End</Th>
@@ -198,14 +194,14 @@ const StaffDashboard = () => {
                   <Td>{l.start_date}</Td>
                   <Td>{l.end_date}</Td>
                   <Td>{l.reason}</Td>
-                  <Td>{l.status}</Td>
+                  <Td>
+                    <Badge colorScheme={l.status === 'approved' ? 'green' : l.status === 'pending' ? 'orange' : 'red'}>
+                      {l.status}
+                    </Badge>
+                  </Td>
                   <Td>
                     {l.status === 'pending' && (
-                      <Button
-                        size="sm"
-                        colorScheme="orange"
-                        onClick={() => cancelLeave(l.id)}
-                      >
+                      <Button size="sm" colorScheme="orange" onClick={() => cancelLeave(l.id)}>
                         Cancel
                       </Button>
                     )}
