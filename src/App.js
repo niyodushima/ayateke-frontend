@@ -3,8 +3,10 @@ import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
 import StaffDashboard from './pages/StaffDashboard';
 import StaffTraining from './components/StaffTraining';
+import StaffProfile from './pages/StaffProfile';
 import DashboardLayout from './layouts/DashboardLayout';
 import AdminTrainingDashboard from './pages/AdminTrainingDashboard';
+
 
 function App() {
   return (
@@ -23,6 +25,7 @@ function App() {
         <Route path="/staff" element={<DashboardLayout />}>
           <Route path="training" element={<StaffTraining />} />
           <Route index element={<StaffDashboard />} />
+          <Route path="profile" element={<StaffProfile />} />
           {/* Add more staff subroutes here if needed */}
         </Route>
       </Routes>
