@@ -10,7 +10,6 @@ function App() {
       <Routes>
         {/* Public route */}
         <Route path="/" element={<Login />} />
-        <Route path="training" element={<StaffTraining />} />
         {/* Admin routes wrapped in layout */}
         <Route path="/admin" element={<DashboardLayout />}>
           <Route path="dashboard" element={<AdminDashboard />} />
@@ -19,6 +18,7 @@ function App() {
 
         {/* Staff routes wrapped in layout */}
         <Route path="/staff" element={<DashboardLayout />}>
+          <Route path="training" element={<StaffTraining />} />
           <Route index element={<StaffDashboard />} />
           {/* Add more staff subroutes here if needed */}
         </Route>
