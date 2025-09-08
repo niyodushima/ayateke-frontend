@@ -1,3 +1,4 @@
+// src/components/Sidebar.jsx
 import {
   Box,
   Flex,
@@ -6,14 +7,13 @@ import {
   IconButton,
   Avatar,
   Divider,
+  Badge,
   useColorMode,
   useColorModeValue,
 } from '@chakra-ui/react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import {
-  MoonIcon,
-  SunIcon,
-} from '@chakra-ui/icons';
+import { useEffect, useMemo, useState } from 'react';
+import { MoonIcon, SunIcon } from '@chakra-ui/icons';
 import {
   FaHome,
   FaUsers,
@@ -24,8 +24,6 @@ import {
   FaCalendarAlt,
   FaEdit,
   FaCalendarCheck,
-  FaFileAlt,
-  FaMoneyCheckAlt,
   FaUserCircle,
 } from 'react-icons/fa';
 
@@ -39,26 +37,133 @@ const Sidebar = ({ currentPath, onClose }) => {
   const borderColor = useColorModeValue('teal', 'teal.300');
   const textColor = useColorModeValue('gray.800', 'white');
 
-  const user = JSON.parse(localStorage.getItem('user') || 'null');
+  const user = useMemo(
+    () => JSON.parse(localStorage.getItem('user') || 'null'),
+    []
+  );
   const userRole = user?.role || 'staff';
 
+  // Configure your API base URL via env or default to localhost
+  const API_BASE =
+    process.env.REACT_APP_API_URL?.replace(/\/$/, '') || 'http://localhost:5000';
+
+  // Sidebar stats
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    pendingLeaves: 0,
+    myPendingLeaves: 0,
+    trainings: 0,
+  });
+
+  // Fetch helpers
+  const safeJson = async (res) => {
+    try {
+      return await res.json();
+    } catch {
+      return null;
+    }
+  };
+
+  const fetchAdminStats = async () => {
+    const [usersRes, leavesRes] = await Promise.allSettled([
+      fetch(`${API_BASE}/api/users`),
+      fetch(`${API_BASE}/api/leaves`),
+    ]);
+
+    let users = [];
+    let leaves = [];
+
+    if (usersRes.status === 'fulfilled' && usersRes.value.ok) {
+      const data = await safeJson(usersRes.value);
+      users = Array.isArray(data) ? data : Array.isArray(data?.data) ? data.data : [];
+    }
+
+    if (leavesRes.status === 'fulfilled' && leavesRes.value.ok) {
+      const data = await safeJson(leavesRes.value);
+      leaves = Array.isArray(data) ? data : Array.isArray(data?.data) ? data.data : [];
+    }
+
+    setStats((s) => ({
+      ...s,
+      totalUsers: users.length,
+      pendingLeaves: leaves.filter((l) => l.status === 'pending').length,
+      // TODO: replace trainings with real count when endpoint is ready
+      trainings: s.trainings || 5,
+    }));
+  };
+
+  const fetchStaffStats = async () => {
+    const leavesRes = await fetch(`${API_BASE}/api/leaves`).catch(() => null);
+    let leaves = [];
+    if (leavesRes?.ok) {
+      const data = await safeJson(leavesRes);
+      leaves = Array.isArray(data) ? data : Array.isArray(data?.data) ? data.data : [];
+    }
+
+    const myLeaves = leaves.filter((l) => l.employee_id === user?.email);
+
+    setStats((s) => ({
+      ...s,
+      myPendingLeaves: myLeaves.filter((l) => l.status === 'pending').length,
+      // TODO: replace trainings with staff-specific training count when available
+      trainings: s.trainings || 3,
+    }));
+  };
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const load = async () => {
+      try {
+        if (userRole === 'admin') await fetchAdminStats();
+        else await fetchStaffStats();
+      } catch {
+        // swallow errors to avoid crashing the sidebar
+      }
+    };
+
+    load();
+
+    // Optional: refresh every 60s to keep badges fresh
+    const interval = setInterval(() => {
+      if (isMounted) load();
+    }, 60000);
+
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, [userRole, user?.email, API_BASE]);
+
+  // Navigation items with optional badges
   const adminNav = [
     { label: 'Dashboard', icon: FaHome, path: '/admin/dashboard' },
-    { label: 'Staff Directory', icon: FaUsers, path: '/admin/staff' },
+    { label: 'Staff Directory', icon: FaUsers, path: '/admin/staff', badge: stats.totalUsers },
     { label: 'Contracts', icon: FaFileContract, path: '/admin/contracts' },
     { label: 'Payroll', icon: FaMoneyBillWave, path: '/admin/payroll' },
-    { label: 'Leave Requests', icon: FaCalendarAlt, path: '/admin/leaves' },
+    { label: 'Leave Requests', icon: FaCalendarAlt, path: '/admin/leaves', badge: stats.pendingLeaves },
+    { label: 'Training', icon: FaUsers, path: '/admin/training', badge: stats.trainings },
     { label: 'Settings', icon: FaCog, path: '/admin/settings' },
   ];
 
   const staffNav = [
     { label: 'Dashboard', icon: FaHome, path: '/staff' },
     { label: 'Submit Leave', icon: FaEdit, path: '/staff/leave-request' },
-    { label: 'My Leave History', icon: FaCalendarCheck, path: '/staff/leaves' },
-    { label: 'Profile', icon: FaUserCircle, path: '/staff/profile' }, // ✅ New working link
+    { label: 'My Leave History', icon: FaCalendarCheck, path: '/staff/leaves', badge: stats.myPendingLeaves },
+    { label: 'Training', icon: FaUsers, path: '/staff/training', badge: stats.trainings },
+    { label: 'Profile', icon: FaUserCircle, path: '/staff/profile' },
   ];
 
   const visibleItems = userRole === 'admin' ? adminNav : staffNav;
+
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate('/');
+  };
+
+  const handleItemClick = () => {
+    if (onClose) onClose();
+  };
 
   return (
     <Box
@@ -101,11 +206,12 @@ const Sidebar = ({ currentPath, onClose }) => {
       {/* Navigation */}
       <VStack align="start" spacing={2}>
         {visibleItems.map((item, index) => (
-          <NavLink key={index} to={item.path} onClick={onClose}>
+          <NavLink key={index} to={item.path} onClick={handleItemClick}>
             {({ isActive }) => (
               <Flex
                 align="center"
-                gap={3}
+                justify="space-between"
+                w="full"
                 px={3}
                 py={2}
                 borderRadius="md"
@@ -116,8 +222,16 @@ const Sidebar = ({ currentPath, onClose }) => {
                 _hover={{ bg: hoverBg, cursor: 'pointer' }}
                 transition="all 0.2s ease"
               >
-                <Box as={item.icon} fontSize="lg" />
-                <Text>{item.label}</Text>
+                <Flex align="center" gap={3}>
+                  <Box as={item.icon} fontSize="lg" />
+                  <Text>{item.label}</Text>
+                </Flex>
+
+                {typeof item.badge === 'number' && item.badge > 0 && (
+                  <Badge colorScheme="teal" borderRadius="full" px={2}>
+                    {item.badge}
+                  </Badge>
+                )}
               </Flex>
             )}
           </NavLink>
@@ -134,10 +248,7 @@ const Sidebar = ({ currentPath, onClose }) => {
         color={textColor}
         _hover={{ bg: hoverBg, cursor: 'pointer' }}
         transition="all 0.2s ease"
-        onClick={() => {
-          localStorage.clear();
-          navigate('/');
-        }}
+        onClick={handleLogout}
       >
         <Box as={FaSignOutAlt} fontSize="lg" />
         <Text ml={3}>Logout</Text>
