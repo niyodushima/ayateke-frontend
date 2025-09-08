@@ -6,11 +6,6 @@ import StaffTraining from './components/StaffTraining'; // ✅ moved to pages fo
 import StaffProfile from './components/StaffProfile';   // ✅ moved to pages for consistency
 import DashboardLayout from './layouts/DashboardLayout';
 import AdminTrainingDashboard from './pages/AdminTrainingDashboard';
-import attendanceRoutes from './routes/attendance.js';
-
-// ... your other middleware and routes
- 
-app.use('/api/attendance', attendanceRoutes);
 
 // app.listen(...) or export app – keep your existing setup
 
