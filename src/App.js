@@ -9,7 +9,7 @@ import AdminTrainingDashboard from './pages/AdminTrainingDashboard';
 import attendanceRoutes from './routes/attendance.js';
 
 // ... your other middleware and routes
-
+ 
 app.use('/api/attendance', attendanceRoutes);
 
 // app.listen(...) or export app – keep your existing setup
