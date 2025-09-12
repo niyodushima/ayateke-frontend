@@ -37,7 +37,7 @@ const DashboardLayout = () => {
           <Sidebar currentPath={location.pathname} onClose={onClose} />
         </DrawerContent>
       </Drawer>
-
+ 
       {/* Main content */}
       <Box flex="1" display="flex" flexDirection="column">
         <Box position="sticky" top="0" zIndex="20">
