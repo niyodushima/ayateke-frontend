@@ -131,7 +131,7 @@ export default function Branches() {
   };
 
   const deleteEntry = async (branchName, tableName, id) => {
-    if (!confirm('Delete this entry?')) return;
+    if (!window.confirm('Delete this entry?')) return;
     try {
       await axios.delete(`${API_BASE}/api/branches/${branchName}/${tableName}/${id}`);
       await load();
