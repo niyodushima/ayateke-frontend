@@ -1,37 +1,17 @@
+// src/components/Sidebar.jsx
 import {
-  Box,
-  Flex,
-  Text,
-  VStack,
-  IconButton,
-  Avatar,
-  Divider,
-  Badge,
-  useColorMode,
-  useColorModeValue,
+  Box, Flex, Text, VStack, IconButton, Avatar, Badge, useColorMode, useColorModeValue,
 } from '@chakra-ui/react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useEffect, useMemo, useState } from 'react';
 import { MoonIcon, SunIcon } from '@chakra-ui/icons';
-import {
-  FaHome,
-  FaUsers,
-  FaCog,
-  FaSignOutAlt,
-  FaFileContract,
-  FaMoneyBillWave,
-  FaCalendarAlt,
-  FaEdit,
-  FaCalendarCheck,
-  FaUserCircle,
-} from 'react-icons/fa';
+import { FaHome, FaUsers, FaCog, FaSignOutAlt, FaFileContract, FaMoneyBillWave, FaCalendarAlt, FaEdit, FaCalendarCheck, FaUserCircle } from 'react-icons/fa';
 
-// ✅ Exported helper so other components can trigger a sidebar refresh
 export const triggerSidebarRefresh = () => {
   window.dispatchEvent(new Event('sidebar-refresh'));
 };
 
-const Sidebar = ({ currentPath, onClose }) => {
+const Sidebar = ({ onClose }) => {
   const navigate = useNavigate();
   const { colorMode, toggleColorMode } = useColorMode();
 
@@ -41,14 +21,10 @@ const Sidebar = ({ currentPath, onClose }) => {
   const borderColor = useColorModeValue('teal', 'teal.300');
   const textColor = useColorModeValue('gray.800', 'white');
 
-  const user = useMemo(
-    () => JSON.parse(localStorage.getItem('user') || 'null'),
-    []
-  );
+  const user = useMemo(() => JSON.parse(localStorage.getItem('user') || 'null'), []);
   const userRole = user?.role || 'staff';
 
-  const API_BASE =
-    process.env.REACT_APP_API_URL?.replace(/\/$/, '') || 'http://localhost:5000';
+  const API_BASE = process.env.REACT_APP_API_URL?.replace(/\/$/, '') || 'https://ayateke-backend.onrender.com';
 
   const [stats, setStats] = useState({
     totalUsers: 0,
@@ -59,23 +35,19 @@ const Sidebar = ({ currentPath, onClose }) => {
   });
 
   const safeJson = async (res) => {
-    try {
-      return await res.json();
-    } catch {
-      return null;
-    }
+    try { return await res.json(); } catch { return null; }
   };
 
   const fetchAdminStats = async () => {
-    const [usersRes, leavesRes, attendanceRes] = await Promise.allSettled([
+    const today = new Date().toISOString().split('T')[0];
+
+    const [usersRes, leavesRes] = await Promise.allSettled([
       fetch(`${API_BASE}/api/users`),
       fetch(`${API_BASE}/api/leaves`),
-      fetch(`${API_BASE}/api/attendance/today`),
     ]);
 
     let users = [];
     let leaves = [];
-    let attendance = [];
 
     if (usersRes.status === 'fulfilled' && usersRes.value.ok) {
       const data = await safeJson(usersRes.value);
@@ -87,65 +59,74 @@ const Sidebar = ({ currentPath, onClose }) => {
       leaves = Array.isArray(data) ? data : Array.isArray(data?.data) ? data.data : [];
     }
 
-    if (attendanceRes.status === 'fulfilled' && attendanceRes.value.ok) {
-      const data = await safeJson(attendanceRes.value);
-      attendance = Array.isArray(data) ? data : [];
-    }
+    let todayAttendanceCount = 0;
+    try {
+      const tRes = await fetch(`${API_BASE}/api/attendance/today`);
+      if (tRes.ok) {
+        const t = await safeJson(tRes);
+        todayAttendanceCount = Array.isArray(t) ? t.length : 0;
+      } else if (tRes.status === 404) {
+        const qRes = await fetch(`${API_BASE}/api/attendance?date=${today}`);
+        if (qRes.ok) {
+          const q = await safeJson(qRes);
+          todayAttendanceCount = Array.isArray(q) ? q.length : 0;
+        }
+      }
+    } catch { /* ignore */ }
 
     setStats((s) => ({
       ...s,
       totalUsers: users.length,
       pendingLeaves: leaves.filter((l) => l.status === 'pending').length,
       trainings: s.trainings || 5,
-      todayAttendance: attendance.length,
+      todayAttendance: todayAttendanceCount,
     }));
   };
 
   const fetchStaffStats = async () => {
-    const leavesRes = await fetch(`${API_BASE}/api/leaves`).catch(() => null);
-    let leaves = [];
-    if (leavesRes?.ok) {
-      const data = await safeJson(leavesRes);
-      leaves = Array.isArray(data) ? data : Array.isArray(data?.data) ? data.data : [];
-    }
+    const today = new Date().toISOString().split('T')[0];
+    let myPending = 0;
+    try {
+      const res = await fetch(`${API_BASE}/api/leaves`);
+      if (res.ok) {
+        const data = await safeJson(res);
+        const leaves = Array.isArray(data) ? data : Array.isArray(data?.data) ? data.data : [];
+        myPending = leaves.filter((l) => l.employee_id === user?.email && l.status === 'pending').length;
+      }
+    } catch { /* ignore */ }
 
-    const myLeaves = leaves.filter((l) => l.employee_id === user?.email);
+    // Optional: also show how many times user checked in today
+    let myToday = 0;
+    try {
+      const res = await fetch(`${API_BASE}/api/attendance/today`);
+      if (res.ok) {
+        const t = await safeJson(res);
+        myToday = (Array.isArray(t) ? t : []).filter((r) => r.employee_id === user?.email).length;
+      }
+    } catch { /* ignore */ }
 
     setStats((s) => ({
       ...s,
-      myPendingLeaves: myLeaves.filter((l) => l.status === 'pending').length,
+      myPendingLeaves: myPending,
       trainings: s.trainings || 3,
+      todayAttendance: myToday || s.todayAttendance, // keep admin badge logic separate
     }));
   };
 
   useEffect(() => {
-    let isMounted = true;
-
     const load = async () => {
-      try {
-        if (userRole === 'admin') await fetchAdminStats();
-        else await fetchStaffStats();
-      } catch {
-        // ignore errors
-      }
+      if (userRole === 'admin') await fetchAdminStats();
+      else await fetchStaffStats();
     };
 
     load();
 
-    // ✅ Listen for manual refresh events from other components
-    const handleRefresh = () => {
-      if (userRole === 'admin') fetchAdminStats();
-      else fetchStaffStats();
-    };
+    const handleRefresh = () => load();
     window.addEventListener('sidebar-refresh', handleRefresh);
 
-    // ✅ Faster polling for a more live feel
-    const interval = setInterval(() => {
-      if (isMounted) load();
-    }, 15000);
+    const interval = setInterval(load, 15000);
 
     return () => {
-      isMounted = false;
       clearInterval(interval);
       window.removeEventListener('sidebar-refresh', handleRefresh);
     };
@@ -182,21 +163,9 @@ const Sidebar = ({ currentPath, onClose }) => {
   };
 
   return (
-    <Box
-      w={{ base: 'full', md: '250px' }}
-      bg={bg}
-      p={5}
-      shadow="md"
-      height="100vh"
-      position="sticky"
-      top="0"
-      zIndex="10"
-    >
-      {/* Header */}
+    <Box w={{ base: 'full', md: '250px' }} bg={bg} p={5} shadow="md" height="100vh" position="sticky" top="0" zIndex="10">
       <Flex justify="space-between" align="center" mb={6}>
-        <Text fontSize="xl" fontWeight="bold" color="teal.600">
-          Ayateke HR
-        </Text>
+        <Text fontSize="xl" fontWeight="bold" color="teal.600">Ayateke HR</Text>
         <IconButton
           icon={colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
           onClick={toggleColorMode}
@@ -206,20 +175,14 @@ const Sidebar = ({ currentPath, onClose }) => {
         />
       </Flex>
 
-      {/* User Info */}
       <Flex align="center" gap={3} mb={6}>
         <Avatar size="sm" name={user?.name || 'User'} />
         <Box>
-          <Text fontWeight="medium" color={textColor}>
-            {user?.name || 'Staff'}
-          </Text>
-          <Text fontSize="sm" color="gray.500">
-            {userRole.charAt(0).toUpperCase() + userRole.slice(1)}
-          </Text>
+          <Text fontWeight="medium" color={textColor}>{user?.name || 'Staff'}</Text>
+          <Text fontSize="sm" color="gray.500">{userRole.charAt(0).toUpperCase() + userRole.slice(1)}</Text>
         </Box>
       </Flex>
 
-      {/* Navigation */}
       <VStack align="start" spacing={2}>
         {visibleItems.map((item, index) => (
           <NavLink key={index} to={item.path} onClick={handleItemClick}>
@@ -242,10 +205,8 @@ const Sidebar = ({ currentPath, onClose }) => {
                   <Box as={item.icon} fontSize="lg" />
                   <Text>{item.label}</Text>
                 </Flex>
-
                 {typeof item.badge === 'number' && item.badge > 0 && (
-                  <Badge colorScheme="teal" borderRadius="full" px={2}>                    {item.badge}
-                  </Badge>
+                  <Badge colorScheme="teal" borderRadius="md">{item.badge}</Badge>
                 )}
               </Flex>
             )}
@@ -253,24 +214,18 @@ const Sidebar = ({ currentPath, onClose }) => {
         ))}
       </VStack>
 
-      <Divider my={6} />
-
-      {/* Logout */}
-      <Flex
-        px={3}
-        py={2}
-        borderRadius="md"
-        color={textColor}
-        _hover={{ bg: hoverBg, cursor: 'pointer' }}
-        transition="all 0.2s ease"
-        onClick={handleLogout}
-      >
-        <Box as={FaSignOutAlt} fontSize="lg" />
-        <Text ml={3}>Logout</Text>
+      <Flex mt={8} pt={4} borderTop="1px solid" borderColor={hoverBg} align="center" justify="space-between">
+        <Text fontSize="sm" color="gray.500">Signed in</Text>
+        <IconButton
+          icon={<FaSignOutAlt />}
+          onClick={handleLogout}
+          size="sm"
+          variant="outline"
+          aria-label="Logout"
+        />
       </Flex>
     </Box>
   );
 };
 
 export default Sidebar;
-
