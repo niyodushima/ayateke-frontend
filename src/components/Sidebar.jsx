@@ -1,4 +1,3 @@
-// src/components/Sidebar.jsx
 import {
   Box,
   Flex,
@@ -43,19 +42,17 @@ const Sidebar = ({ currentPath, onClose }) => {
   );
   const userRole = user?.role || 'staff';
 
-  // Configure your API base URL via env or default to localhost
   const API_BASE =
     process.env.REACT_APP_API_URL?.replace(/\/$/, '') || 'http://localhost:5000';
 
-  // Sidebar stats
   const [stats, setStats] = useState({
     totalUsers: 0,
     pendingLeaves: 0,
     myPendingLeaves: 0,
     trainings: 0,
+    todayAttendance: 0,
   });
 
-  // Fetch helpers
   const safeJson = async (res) => {
     try {
       return await res.json();
@@ -65,13 +62,15 @@ const Sidebar = ({ currentPath, onClose }) => {
   };
 
   const fetchAdminStats = async () => {
-    const [usersRes, leavesRes] = await Promise.allSettled([
+    const [usersRes, leavesRes, attendanceRes] = await Promise.allSettled([
       fetch(`${API_BASE}/api/users`),
       fetch(`${API_BASE}/api/leaves`),
+      fetch(`${API_BASE}/api/attendance/today`),
     ]);
 
     let users = [];
     let leaves = [];
+    let attendance = [];
 
     if (usersRes.status === 'fulfilled' && usersRes.value.ok) {
       const data = await safeJson(usersRes.value);
@@ -83,12 +82,17 @@ const Sidebar = ({ currentPath, onClose }) => {
       leaves = Array.isArray(data) ? data : Array.isArray(data?.data) ? data.data : [];
     }
 
+    if (attendanceRes.status === 'fulfilled' && attendanceRes.value.ok) {
+      const data = await safeJson(attendanceRes.value);
+      attendance = Array.isArray(data) ? data : [];
+    }
+
     setStats((s) => ({
       ...s,
       totalUsers: users.length,
       pendingLeaves: leaves.filter((l) => l.status === 'pending').length,
-      // TODO: replace trainings with real count when endpoint is ready
       trainings: s.trainings || 5,
+      todayAttendance: attendance.length,
     }));
   };
 
@@ -105,7 +109,6 @@ const Sidebar = ({ currentPath, onClose }) => {
     setStats((s) => ({
       ...s,
       myPendingLeaves: myLeaves.filter((l) => l.status === 'pending').length,
-      // TODO: replace trainings with staff-specific training count when available
       trainings: s.trainings || 3,
     }));
   };
@@ -118,13 +121,12 @@ const Sidebar = ({ currentPath, onClose }) => {
         if (userRole === 'admin') await fetchAdminStats();
         else await fetchStaffStats();
       } catch {
-        // swallow errors to avoid crashing the sidebar
+        // ignore errors
       }
     };
 
     load();
 
-    // Optional: refresh every 60s to keep badges fresh
     const interval = setInterval(() => {
       if (isMounted) load();
     }, 60000);
@@ -135,13 +137,13 @@ const Sidebar = ({ currentPath, onClose }) => {
     };
   }, [userRole, user?.email, API_BASE]);
 
-  // Navigation items with optional badges
   const adminNav = [
     { label: 'Dashboard', icon: FaHome, path: '/admin/dashboard' },
     { label: 'Staff Directory', icon: FaUsers, path: '/admin/staff', badge: stats.totalUsers },
     { label: 'Contracts', icon: FaFileContract, path: '/admin/contracts' },
     { label: 'Payroll', icon: FaMoneyBillWave, path: '/admin/payroll' },
     { label: 'Leave Requests', icon: FaCalendarAlt, path: '/admin/leaves', badge: stats.pendingLeaves },
+    { label: 'Attendance', icon: FaCalendarCheck, path: '/admin/attendance', badge: stats.todayAttendance },
     { label: 'Training', icon: FaUsers, path: '/admin/training', badge: stats.trainings },
     { label: 'Settings', icon: FaCog, path: '/admin/settings' },
   ];
@@ -197,64 +199,4 @@ const Sidebar = ({ currentPath, onClose }) => {
           <Text fontWeight="medium" color={textColor}>
             {user?.name || 'Staff'}
           </Text>
-          <Text fontSize="sm" color="gray.500">
-            {userRole.charAt(0).toUpperCase() + userRole.slice(1)}
-          </Text>
-        </Box>
-      </Flex>
-
-      {/* Navigation */}
-      <VStack align="start" spacing={2}>
-        {visibleItems.map((item, index) => (
-          <NavLink key={index} to={item.path} onClick={handleItemClick}>
-            {({ isActive }) => (
-              <Flex
-                align="center"
-                justify="space-between"
-                w="full"
-                px={3}
-                py={2}
-                borderRadius="md"
-                bg={isActive ? activeBg : 'transparent'}
-                fontWeight={isActive ? 'bold' : 'normal'}
-                borderLeft={isActive ? `4px solid ${borderColor}` : '4px solid transparent'}
-                color={textColor}
-                _hover={{ bg: hoverBg, cursor: 'pointer' }}
-                transition="all 0.2s ease"
-              >
-                <Flex align="center" gap={3}>
-                  <Box as={item.icon} fontSize="lg" />
-                  <Text>{item.label}</Text>
-                </Flex>
-
-                {typeof item.badge === 'number' && item.badge > 0 && (
-                  <Badge colorScheme="teal" borderRadius="full" px={2}>
-                    {item.badge}
-                  </Badge>
-                )}
-              </Flex>
-            )}
-          </NavLink>
-        ))}
-      </VStack>
-
-      <Divider my={6} />
-
-      {/* Logout */}
-      <Flex
-        px={3}
-        py={2}
-        borderRadius="md"
-        color={textColor}
-        _hover={{ bg: hoverBg, cursor: 'pointer' }}
-        transition="all 0.2s ease"
-        onClick={handleLogout}
-      >
-        <Box as={FaSignOutAlt} fontSize="lg" />
-        <Text ml={3}>Logout</Text>
-      </Flex>
-    </Box>
-  );
-};
-
-export default Sidebar;
+          <Text fontSize="sm" color="gray.500
