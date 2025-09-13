@@ -17,7 +17,7 @@ function Attendance() {
         })
         .catch(err => {
           console.error('Error fetching attendance:', err);
-          setError('Failed to load attendance logs.');
+          setError('Failed to load attendance 4logs.');
           setLoading(false);
         });
     };
