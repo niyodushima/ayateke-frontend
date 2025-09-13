@@ -1,11 +1,15 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+
+// Pages
 import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminTrainingDashboard from './pages/AdminTrainingDashboard';
-import Attendance from './pages/Attendance'; // ✅ NEW: Attendance page
+import Attendance from './pages/Attendance';
 import StaffDashboard from './pages/StaffDashboard';
-import StaffTraining from './components/StaffTraining'; // ✅ moved to pages for consistency
-import StaffProfile from './components/StaffProfile';   // ✅ moved to pages for consistency
+import StaffTraining from './pages/StaffTraining'; // ✅ moved to pages for consistency
+import StaffProfile from './pages/StaffProfile';   // ✅ moved to pages for consistency
+
+// Layouts
 import DashboardLayout from './layouts/DashboardLayout';
 
 // ✅ Role-based route guard
@@ -45,7 +49,7 @@ function App() {
         >
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="training" element={<AdminTrainingDashboard />} />
-          <Route path="attendance" element={<Attendance />} /> {/* ✅ NEW route */}
+          <Route path="attendance" element={<Attendance />} /> {/* ✅ Attendance route */}
         </Route>
 
         {/* Staff routes */}
