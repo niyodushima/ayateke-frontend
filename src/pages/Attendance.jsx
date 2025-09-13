@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
-import { triggerSidebarRefresh } from '../components/Sidebar'; // make sure Sidebar exports this
+import { triggerSidebarRefresh } from '../components/Sidebar';
 
-// ✅ Clean API base (no trailing slash)
 const API_BASE =
   process.env.REACT_APP_API_URL?.replace(/\/$/, '') ||
   'https://ayateke-backend.onrender.com';
@@ -11,61 +10,104 @@ function Attendance() {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-
-  // Replace with your actual logged‑in user data
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
-  // ✅ Reusable fetch function
-  const fetchLogs = useCallback(() => {
+  const fetchLogs = useCallback(async () => {
     setLoading(true);
     setError('');
-    axios
-      .get(`${API_BASE}/api/attendance/today`, { withCredentials: true })
-      .then((res) => {
-        setLogs(Array.isArray(res.data) ? res.data : []);
-      })
-      .catch((err) => {
-        console.error('Error fetching attendance:', err);
+
+    const today = new Date().toISOString().split('T')[0];
+
+    try {
+      // Try the /today endpoint first
+      const resToday = await axios.get(`${API_BASE}/api/attendance/today`, {
+        withCredentials: true,
+      });
+      setLogs(Array.isArray(resToday.data) ? resToday.data : []);
+    } catch (e1) {
+      // If /today is missing (404), fallback to ?date=
+      if (e1?.response?.status === 404) {
+        try {
+          const resQ = await axios.get(`${API_BASE}/api/attendance`, {
+            params: { date: today },
+            withCredentials: true,
+          });
+          setLogs(Array.isArray(resQ.data) ? resQ.data : []);
+        } catch (e2) {
+          console.error('Fallback fetch failed:', e2);
+          setError('Failed to load attendance logs.');
+        }
+      } else {
+        console.error('Error fetching attendance (today):', e1);
         setError('Failed to load attendance logs.');
-      })
-      .finally(() => setLoading(false));
+      }
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
     fetchLogs();
-    const interval = setInterval(fetchLogs, 15000); // refresh every 15s
+    const interval = setInterval(fetchLogs, 15000);
     return () => clearInterval(interval);
   }, [fetchLogs]);
 
   // ✅ Check-in action
   const handleCheckIn = async () => {
+    const today = new Date().toISOString().split('T')[0];
+    const clockInTime = new Date()
+      .toLocaleTimeString('en-GB', { hour12: false })
+      .slice(0, 5);
+
     try {
       await axios.post(
-        `${API_BASE}/api/attendance/checkin`,
-        { email: user.email, name: user.name },
+        `${API_BASE}/api/attendance`,
+        {
+          employee_id: user.email || 'unknown@user',
+          date: today,
+          clock_in: clockInTime,
+          clock_out: '00:00', // placeholder if validator requires it
+        },
         { headers: { 'Content-Type': 'application/json' }, withCredentials: true }
       );
-      fetchLogs();
+      await fetchLogs();
       triggerSidebarRefresh();
     } catch (err) {
       console.error('Check-in failed:', err);
-      alert(err.response?.data?.error || 'Check-in failed');
+      alert(
+        err.response?.data?.error ||
+          err.response?.data?.errors?.[0]?.msg ||
+          'Check-in failed'
+      );
     }
   };
 
-  // ✅ Check-out action
+  // ✅ Check-out action (new /checkout route)
   const handleCheckOut = async () => {
+    const today = new Date().toISOString().split('T')[0];
+    const clockOutTime = new Date()
+      .toLocaleTimeString('en-GB', { hour12: false })
+      .slice(0, 5);
+
     try {
-      await axios.post(
+      await axios.put(
         `${API_BASE}/api/attendance/checkout`,
-        { email: user.email },
+        {
+          employee_id: user.email || 'unknown@user',
+          date: today,
+          clock_out: clockOutTime,
+        },
         { headers: { 'Content-Type': 'application/json' }, withCredentials: true }
       );
-      fetchLogs();
+      await fetchLogs();
       triggerSidebarRefresh();
     } catch (err) {
       console.error('Check-out failed:', err);
-      alert(err.response?.data?.error || 'Check-out failed');
+      alert(
+        err.response?.data?.error ||
+          err.response?.data?.errors?.[0]?.msg ||
+          'Check-out failed'
+      );
     }
   };
 
@@ -73,7 +115,6 @@ function Attendance() {
     <div style={{ padding: '2rem', maxWidth: '1000px', margin: '0 auto' }}>
       <h2 style={{ marginBottom: '1rem' }}>📋 Today's Attendance</h2>
 
-      {/* ✅ Action buttons */}
       <div style={{ marginBottom: '1rem' }}>
         <button onClick={handleCheckIn} style={{ marginRight: '1rem' }}>
           Check In
@@ -83,7 +124,6 @@ function Attendance() {
 
       {loading && <p>Loading attendance records...</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
-
       {!loading && !error && logs.length === 0 && (
         <p>No attendance records found for today.</p>
       )}
@@ -92,43 +132,19 @@ function Attendance() {
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ backgroundColor: '#f0f0f0' }}>
-              <th style={th}>Name</th>
-              <th style={th}>Email</th>
-              <th style={th}>Check-in</th>
-              <th style={th}>Check-out</th>
-              <th style={th}>Status</th>
+              <th style={th}>Employee</th>
+              <th style={th}>Date</th>
+              <th style={th}>Clock-in</th>
+              <th style={th}>Clock-out</th>
             </tr>
           </thead>
           <tbody>
             {logs.map((log, index) => (
               <tr key={index} style={{ borderBottom: '1px solid #ddd' }}>
-                <td style={td}>{log.name || '—'}</td>
-                <td style={td}>{log.email}</td>
-                <td style={td}>
-                  {log.checkIn
-                    ? new Date(log.checkIn).toLocaleTimeString()
-                    : '—'}
-                </td>
-                <td style={td}>
-                  {log.checkOut
-                    ? new Date(log.checkOut).toLocaleTimeString()
-                    : '—'}
-                </td>
-                <td style={td}>
-                  <span
-                    style={{
-                      padding: '4px 8px',
-                      borderRadius: '6px',
-                      backgroundColor:
-                        log.status === 'Completed' ? '#c6f6d5' : '#fefcbf',
-                      color:
-                        log.status === 'Completed' ? '#22543d' : '#744210',
-                      fontWeight: 'bold',
-                    }}
-                  >
-                    {log.status}
-                  </span>
-                </td>
+                <td style={td}>{log.employee_id || log.email || '—'}</td>
+                <td style={td}>{log.date || '—'}</td>
+                <td style={td}>{log.clock_in || log.checkIn || '—'}</td>
+                <td style={td}>{log.clock_out || log.checkOut || '—'}</td>
               </tr>
             ))}
           </tbody>
