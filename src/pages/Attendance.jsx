@@ -1,3 +1,4 @@
+// src/pages/Attendance.jsx
 import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { triggerSidebarRefresh } from '../components/Sidebar';
@@ -15,17 +16,14 @@ function Attendance() {
   const fetchLogs = useCallback(async () => {
     setLoading(true);
     setError('');
-
     const today = new Date().toISOString().split('T')[0];
 
     try {
-      // Try the /today endpoint first
       const resToday = await axios.get(`${API_BASE}/api/attendance/today`, {
         withCredentials: true,
       });
       setLogs(Array.isArray(resToday.data) ? resToday.data : []);
     } catch (e1) {
-      // If /today is missing (404), fallback to ?date=
       if (e1?.response?.status === 404) {
         try {
           const resQ = await axios.get(`${API_BASE}/api/attendance`, {
@@ -52,12 +50,9 @@ function Attendance() {
     return () => clearInterval(interval);
   }, [fetchLogs]);
 
-  // ✅ Check-in action
   const handleCheckIn = async () => {
     const today = new Date().toISOString().split('T')[0];
-    const clockInTime = new Date()
-      .toLocaleTimeString('en-GB', { hour12: false })
-      .slice(0, 5);
+    const clockInTime = new Date().toLocaleTimeString('en-GB', { hour12: false }).slice(0, 5);
 
     try {
       await axios.post(
@@ -66,7 +61,7 @@ function Attendance() {
           employee_id: user.email || 'unknown@user',
           date: today,
           clock_in: clockInTime,
-          clock_out: '00:00', // placeholder if validator requires it
+          clock_out: '00:00',
         },
         { headers: { 'Content-Type': 'application/json' }, withCredentials: true }
       );
@@ -82,12 +77,9 @@ function Attendance() {
     }
   };
 
-  // ✅ Check-out action (new /checkout route)
   const handleCheckOut = async () => {
     const today = new Date().toISOString().split('T')[0];
-    const clockOutTime = new Date()
-      .toLocaleTimeString('en-GB', { hour12: false })
-      .slice(0, 5);
+    const clockOutTime = new Date().toLocaleTimeString('en-GB', { hour12: false }).slice(0, 5);
 
     try {
       await axios.put(
@@ -103,11 +95,7 @@ function Attendance() {
       triggerSidebarRefresh();
     } catch (err) {
       console.error('Check-out failed:', err);
-      alert(
-        err.response?.data?.error ||
-          err.response?.data?.errors?.[0]?.msg ||
-          'Check-out failed'
-      );
+      alert(err.response?.data?.error || 'Check-out failed');
     }
   };
 
@@ -124,9 +112,7 @@ function Attendance() {
 
       {loading && <p>Loading attendance records...</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
-      {!loading && !error && logs.length === 0 && (
-        <p>No attendance records found for today.</p>
-      )}
+      {!loading && !error && logs.length === 0 && <p>No attendance records found for today.</p>}
 
       {!loading && !error && logs.length > 0 && (
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
