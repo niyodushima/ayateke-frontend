@@ -199,4 +199,39 @@ const Sidebar = ({ currentPath, onClose }) => {
           <Text fontWeight="medium" color={textColor}>
             {user?.name || 'Staff'}
           </Text>
-          <Text fontSize="sm" color="gray.500
+          <Text fontSize="sm" color="gray.500">
+            {userRole.charAt(0).toUpperCase() + userRole.slice(1)}
+          </Text>
+        </Box>
+      </Flex>
+
+      {/* Navigation */}
+      <VStack align="start" spacing={2}>
+        {visibleItems.map((item, index) => (
+          <NavLink key={index} to={item.path} onClick={handleItemClick}>
+            {({ isActive }) => (
+              <Flex
+                align="center"
+                justify="space-between"
+                w="full"
+                px={3}
+                py={2}
+                borderRadius="md"
+                bg={isActive ? activeBg : 'transparent'}
+                fontWeight={isActive ? 'bold' : 'normal'}
+                borderLeft={isActive ? `4px solid ${borderColor}` : '4px solid transparent'}
+                color={textColor}
+                _hover={{ bg: hoverBg, cursor: 'pointer' }}
+                transition="all 0.2s ease"
+              >
+                <Flex align="center" gap={3}>
+                  <Box as={item.icon} fontSize="lg" />
+                  <Text>{item.label}</Text>
+                </Flex>
+
+                {typeof item.badge === 'number' && item.badge > 0 && (
+                  <Badge colorScheme="teal" borderRadius="full" px={2}>
+                    {item.badge}
+                  </Badge>
+                )}
+              </Flex>
