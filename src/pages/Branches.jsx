@@ -227,6 +227,3 @@ export default function Branches() {
               onDelete={(id) => deleteEntry(b.branch, 'schemeManagers', id)}
               onUpdate={(record) => updateEntry(b.branch, 'schemeManagers', record)}
             />
-          </div>
-
-          <div>
