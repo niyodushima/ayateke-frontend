@@ -224,7 +224,7 @@ const Sidebar = ({ currentPath, onClose }) => {
         {visibleItems.map((item, index) => (
           <NavLink key={index} to={item.path} onClick={handleItemClick}>
             {({ isActive }) => (
-              <Flex
+              <Flex 
                 align="center"
                 justify="space-between"
                 w="full"
