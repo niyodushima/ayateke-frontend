@@ -240,7 +240,7 @@ export default function Branches() {
             />
           </div>
         </Section>
-      ))} 
+      
     </div>
   );
 }
