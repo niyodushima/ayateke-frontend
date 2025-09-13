@@ -50,7 +50,12 @@ function Table({ columns, rows, onDelete, onUpdate, isStaff }) {
             )}
             <td style={td}>
               <button onClick={() => onUpdate(r)} style={{ marginRight: 8 }}>Edit</button>
-              <button onClick={() => onDelete(r.id)} style={{ color: 'white', background: '#e53e3e', border: 'none', padding: '6px 10px', borderRadius: 4 }}>Delete</button>
+              <button
+                onClick={() => onDelete(r.id)}
+                style={{ color: 'white', background: '#e53e3e', border: 'none', padding: '6px 10px', borderRadius: 4 }}
+              >
+                Delete
+              </button>
             </td>
           </tr>
         ))}
@@ -142,11 +147,11 @@ export default function Branches() {
   };
 
   const updateEntry = async (branchName, tableName, record) => {
-    const newName = prompt('Update name:', record.name || '');
+    const newName = window.prompt('Update name:', record.name || '');
     if (newName === null) return; // canceled
 
     const payload = tableName === 'staff'
-      ? { name: newName, role: record.role } // keep same role
+      ? { name: newName, role: record.role }
       : { name: newName };
 
     try {
