@@ -8,6 +8,7 @@ import Attendance from './pages/Attendance';
 import StaffDashboard from './pages/StaffDashboard';
 import StaffTraining from './components/StaffTraining'; // ✅ moved to pages for consistency
 import StaffProfile from './components/StaffProfile';   // ✅ moved to pages for consistency
+import Branches from './pages/Branches';
 
 // Layouts
 import DashboardLayout from './layouts/DashboardLayout';
@@ -46,7 +47,7 @@ function App() {
               <DashboardLayout />
             </ProtectedRoute>
           }
-        >
+        ><Route path="/admin/branches" element={<Branches />} />
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="training" element={<AdminTrainingDashboard />} />
           <Route path="attendance" element={<Attendance />} /> {/* ✅ Attendance route */}
