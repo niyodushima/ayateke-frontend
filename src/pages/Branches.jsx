@@ -232,13 +232,13 @@ export default function Branches() {
           <div>
             <h3 style={{ marginBottom: 8 }}>Plumbers</h3>
             <AddForm isStaff={false} onSubmit={(payload) => addEntry(b.branch, 'plumbers', payload)} />
-                       <Table
+                                   <Table
               columns={['Name']}
               rows={filterRows(b.plumbers, false)}
               onDelete={(id) => deleteEntry(b.branch, 'plumbers', id)}
               onUpdate={(record) => updateEntry(b.branch, 'plumbers', record)}
             />
-                 </div>
+          </div>
         </Section>
       ))}
     </div>
