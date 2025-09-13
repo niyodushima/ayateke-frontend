@@ -26,6 +26,11 @@ import {
   FaUserCircle,
 } from 'react-icons/fa';
 
+// ✅ Exported helper so other components can trigger a sidebar refresh
+export const triggerSidebarRefresh = () => {
+  window.dispatchEvent(new Event('sidebar-refresh'));
+};
+
 const Sidebar = ({ currentPath, onClose }) => {
   const navigate = useNavigate();
   const { colorMode, toggleColorMode } = useColorMode();
@@ -127,13 +132,22 @@ const Sidebar = ({ currentPath, onClose }) => {
 
     load();
 
+    // ✅ Listen for manual refresh events from other components
+    const handleRefresh = () => {
+      if (userRole === 'admin') fetchAdminStats();
+      else fetchStaffStats();
+    };
+    window.addEventListener('sidebar-refresh', handleRefresh);
+
+    // ✅ Faster polling for a more live feel
     const interval = setInterval(() => {
       if (isMounted) load();
-    }, 60000);
+    }, 15000);
 
     return () => {
       isMounted = false;
       clearInterval(interval);
+      window.removeEventListener('sidebar-refresh', handleRefresh);
     };
   }, [userRole, user?.email, API_BASE]);
 
@@ -231,31 +245,3 @@ const Sidebar = ({ currentPath, onClose }) => {
 
                 {typeof item.badge === 'number' && item.badge > 0 && (
                   <Badge colorScheme="teal" borderRadius="full" px={2}>
-                    {item.badge}
-                  </Badge>
-                )}
-              </Flex>
-            )}
-          </NavLink>
-        ))}
-      </VStack>
-
-      <Divider my={6} />
-
-      {/* Logout */}
-      <Flex
-        px={3}
-        py={2}
-        borderRadius="md"
-        color={textColor}
-        _hover={{ bg: hoverBg, cursor: 'pointer' }}
-        transition="all 0.2s ease"      onClick={handleLogout}
-    >
-        <Box as={FaSignOutAlt} fontSize="lg" />
-        <Text ml={3}>Logout</Text>
-      </Flex>
-    </Box>
-  );
-};
-
-export default Sidebar;
