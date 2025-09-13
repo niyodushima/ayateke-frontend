@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
-import { triggerSidebarRefresh } from '../components/Sidebar'; // ✅ make sure Sidebar.jsx exports this
+import { triggerSidebarRefresh } from '../components/Sidebar'; // make sure Sidebar exports this
 
 // ✅ Clean API base (no trailing slash)
 const API_BASE =
@@ -11,6 +11,9 @@ function Attendance() {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  // Replace with your actual logged‑in user data
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
 
   // ✅ Reusable fetch function
   const fetchLogs = useCallback(() => {
@@ -30,7 +33,7 @@ function Attendance() {
 
   useEffect(() => {
     fetchLogs();
-    const interval = setInterval(fetchLogs, 15000); // ✅ refresh every 15s
+    const interval = setInterval(fetchLogs, 15000); // refresh every 15s
     return () => clearInterval(interval);
   }, [fetchLogs]);
 
@@ -39,13 +42,14 @@ function Attendance() {
     try {
       await axios.post(
         `${API_BASE}/api/attendance/checkin`,
-        { email: 'user@example.com', name: 'John Doe' }, // replace with real user data
-        { withCredentials: true }
+        { email: user.email, name: user.name },
+        { headers: { 'Content-Type': 'application/json' }, withCredentials: true }
       );
       fetchLogs();
       triggerSidebarRefresh();
     } catch (err) {
       console.error('Check-in failed:', err);
+      alert(err.response?.data?.error || 'Check-in failed');
     }
   };
 
@@ -54,13 +58,14 @@ function Attendance() {
     try {
       await axios.post(
         `${API_BASE}/api/attendance/checkout`,
-        { email: 'user@example.com' }, // replace with real user data
-        { withCredentials: true }
+        { email: user.email },
+        { headers: { 'Content-Type': 'application/json' }, withCredentials: true }
       );
       fetchLogs();
       triggerSidebarRefresh();
     } catch (err) {
       console.error('Check-out failed:', err);
+      alert(err.response?.data?.error || 'Check-out failed');
     }
   };
 
