@@ -234,4 +234,4 @@ const Sidebar = ({ currentPath, onClose }) => {
                     {item.badge}
                   </Badge>
                 )}
-              </Flex>
+              </Flex> 
