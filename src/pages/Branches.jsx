@@ -158,7 +158,7 @@ export default function Branches() {
 
     try {
       await axios.put(`${API_BASE}/api/branches/${branchName}/${tableName}/${record.id}`, payload, {
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type: application/json' },
       });
       await load();
     } catch (err) {
@@ -218,12 +218,20 @@ export default function Branches() {
             />
           </div>
 
-                    <div>
-            <h3 style={{ marginBottom: 8 }}>Plumbers</h3>
-            <AddForm
-              isStaff={false}
-              onSubmit={(payload) => addEntry(b.branch, 'plumbers', payload)}
+          <div style={{ marginBottom: 24 }}>
+            <h3 style={{ marginBottom: 8 }}>Scheme Managers</h3>
+            <AddForm isStaff={false} onSubmit={(payload) => addEntry(b.branch, 'schemeManagers', payload)} />
+            <Table
+              columns={['Name']}
+              rows={filterRows(b.schemeManagers, false)}
+              onDelete={(id) => deleteEntry(b.branch, 'schemeManagers', id)}
+              onUpdate={(record) => updateEntry(b.branch, 'schemeManagers', record)}
             />
+          </div>
+
+          <div>
+            <h3 style={{ marginBottom: 8 }}>Plumbers</h3>
+            <AddForm isStaff={false} onSubmit={(payload) => addEntry(b.branch, 'plumbers', payload)} />
             <Table
               columns={['Name']}
               rows={filterRows(b.plumbers, false)}
