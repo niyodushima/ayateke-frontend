@@ -158,7 +158,7 @@ export default function Branches() {
 
     try {
       await axios.put(`${API_BASE}/api/branches/${branchName}/${tableName}/${record.id}`, payload, {
-        headers: { 'Content-Type: application/json' },
+        headers: { 'Content-Type': 'application/json' },
       });
       await load();
     } catch (err) {
@@ -232,7 +232,7 @@ export default function Branches() {
           <div>
             <h3 style={{ marginBottom: 8 }}>Plumbers</h3>
             <AddForm isStaff={false} onSubmit={(payload) => addEntry(b.branch, 'plumbers', payload)} />
-                         <Table
+                        <Table
               columns={['Name']}
               rows={filterRows(b.plumbers, false)}
               onDelete={(id) => deleteEntry(b.branch, 'plumbers', id)}
