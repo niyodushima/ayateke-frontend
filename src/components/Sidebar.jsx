@@ -5,7 +5,10 @@ import {
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useEffect, useMemo, useState } from 'react';
 import { MoonIcon, SunIcon } from '@chakra-ui/icons';
-import { FaHome, FaUsers, FaCog, FaSignOutAlt, FaFileContract, FaMoneyBillWave, FaCalendarAlt, FaEdit, FaCalendarCheck, FaUserCircle } from 'react-icons/fa';
+import {
+  FaHome, FaUsers, FaCog, FaSignOutAlt, FaFileContract, FaMoneyBillWave,
+  FaCalendarAlt, FaEdit, FaCalendarCheck, FaUserCircle, FaCodeBranch
+} from 'react-icons/fa'; // ⬅️ added FaCodeBranch here
 
 export const triggerSidebarRefresh = () => {
   window.dispatchEvent(new Event('sidebar-refresh'));
@@ -84,7 +87,6 @@ const Sidebar = ({ onClose }) => {
   };
 
   const fetchStaffStats = async () => {
-    const today = new Date().toISOString().split('T')[0];
     let myPending = 0;
     try {
       const res = await fetch(`${API_BASE}/api/leaves`);
@@ -95,7 +97,6 @@ const Sidebar = ({ onClose }) => {
       }
     } catch { /* ignore */ }
 
-    // Optional: also show how many times user checked in today
     let myToday = 0;
     try {
       const res = await fetch(`${API_BASE}/api/attendance/today`);
@@ -109,7 +110,7 @@ const Sidebar = ({ onClose }) => {
       ...s,
       myPendingLeaves: myPending,
       trainings: s.trainings || 3,
-      todayAttendance: myToday || s.todayAttendance, // keep admin badge logic separate
+      todayAttendance: myToday || s.todayAttendance,
     }));
   };
 
@@ -139,6 +140,7 @@ const Sidebar = ({ onClose }) => {
     { label: 'Payroll', icon: FaMoneyBillWave, path: '/admin/payroll' },
     { label: 'Leave Requests', icon: FaCalendarAlt, path: '/admin/leaves', badge: stats.pendingLeaves },
     { label: 'Attendance', icon: FaCalendarCheck, path: '/admin/attendance', badge: stats.todayAttendance },
+    { label: 'Branches', icon: FaCodeBranch, path: '/admin/branches' }, // ⬅️ NEW Branches link
     { label: 'Training', icon: FaUsers, path: '/admin/training', badge: stats.trainings },
     { label: 'Settings', icon: FaCog, path: '/admin/settings' },
   ];
@@ -201,6 +203,7 @@ const Sidebar = ({ onClose }) => {
                 _hover={{ bg: hoverBg, cursor: 'pointer' }}
                 transition="all 0.2s ease"
               >
+
                 <Flex align="center" gap={3}>
                   <Box as={item.icon} fontSize="lg" />
                   <Text>{item.label}</Text>
