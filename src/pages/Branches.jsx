@@ -218,12 +218,24 @@ export default function Branches() {
             />
           </div>
 
-          <div style={{ marginBottom: 24 }}>
-            <h3 style={{ marginBottom: 8 }}>Scheme Managers</h3>
-            <AddForm isStaff={false} onSubmit={(payload) => addEntry(b.branch, 'schemeManagers', payload)} />
+                    <div>
+            <h3 style={{ marginBottom: 8 }}>Plumbers</h3>
+            <AddForm
+              isStaff={false}
+              onSubmit={(payload) => addEntry(b.branch, 'plumbers', payload)}
+            />
             <Table
               columns={['Name']}
-              rows={filterRows(b.schemeManagers, false)}
-              onDelete={(id) => deleteEntry(b.branch, 'schemeManagers', id)}
-              onUpdate={(record) => updateEntry(b.branch, 'schemeManagers', record)}
+              rows={filterRows(b.plumbers, false)}
+              onDelete={(id) => deleteEntry(b.branch, 'plumbers', id)}
+              onUpdate={(record) => updateEntry(b.branch, 'plumbers', record)}
             />
+          </div>
+        </Section>
+      ))}
+    </div>
+  );
+}
+
+const th = { textAlign: 'left', padding: 10, borderBottom: '2px solid #cbd5e0' };
+const td = { padding: 10, verticalAlign: 'top' };
