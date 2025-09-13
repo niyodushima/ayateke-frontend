@@ -234,4 +234,29 @@ const Sidebar = ({ currentPath, onClose }) => {
                     {item.badge}
                   </Badge>
                 )}
-              </Flex> 
+              </Flex>
+            )}
+          </NavLink>
+        ))}
+      </VStack>
+
+      <Divider my={6} />
+
+      {/* Logout */}
+      <Flex
+        px={3}
+        py={2}
+        borderRadius="md"
+        color={textColor}
+        _hover={{ bg: hoverBg, cursor: 'pointer' }}
+        transition="all 0.2s ease"      onClick={handleLogout}
+    >
+        <Box as={FaSignOutAlt} fontSize="lg" />
+        <Text ml={3}>Logout</Text>
+      </Flex>
+    </Box>
+  );
+};
+
+export default Sidebar;
+
