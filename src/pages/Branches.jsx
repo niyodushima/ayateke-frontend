@@ -105,6 +105,8 @@ function AddForm({ isStaff, onSubmit }) {
 export default function Branches() {
   const [branches, setBranches] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [branchFilter, setBranchFilter] = useState('All');
 
   const load = async () => {
     setLoading(true);
@@ -148,7 +150,7 @@ export default function Branches() {
 
   const updateEntry = async (branchName, tableName, record) => {
     const newName = window.prompt('Update name:', record.name || '');
-    if (newName === null) return; // canceled
+    if (newName === null) return;
 
     const payload = tableName === 'staff'
       ? { name: newName, role: record.role }
@@ -165,20 +167,51 @@ export default function Branches() {
     }
   };
 
+  const filterRows = (rows, isStaff) => {
+    if (!searchTerm) return rows;
+    const term = searchTerm.toLowerCase();
+    return rows.filter((r) =>
+      isStaff
+        ? r.role.toLowerCase().includes(term) || (r.name || '').toLowerCase().includes(term)
+        : (r.name || '').toLowerCase().includes(term)
+    );
+  };
+
+  const filteredBranches = branches.filter((b) =>
+    branchFilter === 'All' ? true : b.branch === branchFilter
+  );
+
   if (loading) return <div style={{ padding: 20 }}>Loading branches...</div>;
 
   return (
     <div style={{ padding: 20, maxWidth: 1200, margin: '0 auto' }}>
       <h2 style={{ marginBottom: 16 }}>Ayateke Branches</h2>
 
-      {branches.map((b) => (
+      {/* Search and Filter Controls */}
+      <div style={{ display: 'flex', gap: 10, marginBottom: 20 }}>
+        <input
+          type="text"
+          placeholder="Search by name or role..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          style={{ flex: 1, padding: 8 }}
+        />
+        <select value={branchFilter} onChange={(e) => setBranchFilter(e.target.value)} style={{ padding: 8 }}>
+          <option value="All">All Branches</option>
+          {branches.map((b) => (
+            <option key={b.branch} value={b.branch}>{b.branch}</option>
+          ))}
+        </select>
+      </div>
+
+      {filteredBranches.map((b) => (
         <Section key={b.branch} title={`${b.branch} Branch`}>
           <div style={{ marginBottom: 24 }}>
             <h3 style={{ marginBottom: 8 }}>Staff</h3>
             <AddForm isStaff onSubmit={(payload) => addEntry(b.branch, 'staff', payload)} />
             <Table
               columns={['Role', 'Name']}
-              rows={b.staff}
+              rows={filterRows(b.staff, true)}
               isStaff
               onDelete={(id) => deleteEntry(b.branch, 'staff', id)}
               onUpdate={(record) => updateEntry(b.branch, 'staff', record)}
@@ -190,27 +223,10 @@ export default function Branches() {
             <AddForm isStaff={false} onSubmit={(payload) => addEntry(b.branch, 'schemeManagers', payload)} />
             <Table
               columns={['Name']}
-              rows={b.schemeManagers}
+              rows={filterRows(b.schemeManagers, false)}
               onDelete={(id) => deleteEntry(b.branch, 'schemeManagers', id)}
               onUpdate={(record) => updateEntry(b.branch, 'schemeManagers', record)}
             />
           </div>
 
           <div>
-            <h3 style={{ marginBottom: 8 }}>Plumbers</h3>
-            <AddForm isStaff={false} onSubmit={(payload) => addEntry(b.branch, 'plumbers', payload)} />
-            <Table
-              columns={['Name']}
-              rows={b.plumbers}
-              onDelete={(id) => deleteEntry(b.branch, 'plumbers', id)}
-              onUpdate={(record) => updateEntry(b.branch, 'plumbers', record)}
-            />
-          </div>
-        </Section>
-      ))}
-    </div>
-  );
-}
-
-const th = { textAlign: 'left', padding: 10, borderBottom: '2px solid #cbd5e0' };
-const td = { padding: 10, verticalAlign: 'top' };
