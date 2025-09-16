@@ -51,12 +51,13 @@ function Attendance() {
   const handleCheckIn = async () => {
     const today = getTodayDate();
     const clockInTime = getCurrentTime();
+    const employeeId = user.email || 'unknown@user';
 
     try {
       await axios.post(
         `${API_BASE}/api/attendance`,
         {
-          employee_id: user.email || 'unknown@user',
+          employee_id: employeeId,
           date: today,
           clock_in: clockInTime,
           clock_out: '00:00',
@@ -78,12 +79,13 @@ function Attendance() {
   const handleCheckOut = async () => {
     const today = getTodayDate();
     const clockOutTime = getCurrentTime();
+    const employeeId = user.email || 'unknown@user';
 
     try {
       await axios.put(
         `${API_BASE}/api/attendance/checkout`,
         {
-          employee_id: user.email || 'unknown@user',
+          employee_id: employeeId,
           date: today,
           clock_out: clockOutTime,
         },
@@ -115,23 +117,25 @@ function Attendance() {
           onChange={(e) => setSearchTerm(e.target.value)}
           style={{ padding: '0.5rem', flex: '1' }}
         />
-        <button onClick={fetchLogs}>Fetch</button>
+        <button onClick={fetchLogs} style={{ padding: '0.5rem 1rem' }}>Fetch</button>
       </div>
 
-      <div style={{ marginBottom: '1rem' }}>
-        <button onClick={handleCheckIn} style={{ marginRight: '1rem' }}>
+      <div style={{ marginBottom: '1rem', display: 'flex', gap: '1rem' }}>
+        <button onClick={handleCheckIn} style={{ padding: '0.5rem 1rem' }}>
           Check In
         </button>
-        <button onClick={handleCheckOut}>Check Out</button>
+        <button onClick={handleCheckOut} style={{ padding: '0.5rem 1rem' }}>
+          Check Out
+        </button>
       </div>
 
       {loading && <p>Loading attendance records...</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
-      {!loading && !error && logs.length === 0 && (
+      {!loading && !error && Array.isArray(logs) && logs.length === 0 && (
         <p>No attendance records found for selected filters.</p>
       )}
 
-      {!loading && !error && logs.length > 0 && (
+      {!loading && !error && Array.isArray(logs) && logs.length > 0 && (
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ backgroundColor: '#f0f0f0' }}>
