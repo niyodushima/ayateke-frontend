@@ -10,47 +10,37 @@ function Attendance() {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [selectedDate, setSelectedDate] = useState(getTodayDate());
+  const [searchTerm, setSearchTerm] = useState('');
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
-  const getTodayDate = () =>
-    new Date().toLocaleDateString('en-CA', { timeZone: 'Africa/Kigali' }); // YYYY-MM-DD
+  function getTodayDate() {
+    return new Date().toLocaleDateString('en-CA', { timeZone: 'Africa/Kigali' }); // YYYY-MM-DD
+  }
 
-  const getCurrentTime = () =>
-    new Date().toLocaleTimeString('en-GB', { hour12: false }).slice(0, 5); // HH:MM
+  function getCurrentTime() {
+    return new Date().toLocaleTimeString('en-GB', { hour12: false }).slice(0, 5); // HH:MM
+  }
 
   const fetchLogs = useCallback(async () => {
     setLoading(true);
     setError('');
-    const today = getTodayDate();
-
     try {
-      const resToday = await axios.get(`${API_BASE}/api/attendance/today`, {
+      const res = await axios.get(`${API_BASE}/api/attendance`, {
+        params: {
+          date: selectedDate,
+          employee_id: searchTerm || undefined,
+        },
         withCredentials: true,
       });
-      setLogs(Array.isArray(resToday.data) ? resToday.data : []);
-      if (!Array.isArray(resToday.data)) {
-        console.warn('Unexpected response format:', resToday.data);
-      }
-    } catch (e1) {
-      if (e1?.response?.status === 404) {
-        try {
-          const resQ = await axios.get(`${API_BASE}/api/attendance`, {
-            params: { date: today },
-            withCredentials: true,
-          });
-          setLogs(Array.isArray(resQ.data) ? resQ.data : []);
-        } catch (e2) {
-          console.error('Fallback fetch failed:', e2);
-          setError('Failed to load attendance logs.');
-        }
-      } else {
-        console.error('Error fetching attendance (today):', e1);
-        setError('Failed to load attendance logs.');
-      }
+      setLogs(Array.isArray(res.data) ? res.data : []);
+    } catch (err) {
+      console.error('Error fetching attendance:', err);
+      setError('Failed to load attendance logs.');
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [selectedDate, searchTerm]);
 
   useEffect(() => {
     fetchLogs();
@@ -109,7 +99,24 @@ function Attendance() {
 
   return (
     <div style={{ padding: '2rem', maxWidth: '1000px', margin: '0 auto' }}>
-      <h2 style={{ marginBottom: '1rem' }}>📋 Today's Attendance</h2>
+      <h2 style={{ marginBottom: '1rem' }}>📋 Attendance Logs</h2>
+
+      <div style={{ marginBottom: '1rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+        <input
+          type="date"
+          value={selectedDate}
+          onChange={(e) => setSelectedDate(e.target.value)}
+          style={{ padding: '0.5rem' }}
+        />
+        <input
+          type="text"
+          placeholder="Search by employee ID/email"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          style={{ padding: '0.5rem', flex: '1' }}
+        />
+        <button onClick={fetchLogs}>Fetch</button>
+      </div>
 
       <div style={{ marginBottom: '1rem' }}>
         <button onClick={handleCheckIn} style={{ marginRight: '1rem' }}>
@@ -121,7 +128,7 @@ function Attendance() {
       {loading && <p>Loading attendance records...</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
       {!loading && !error && logs.length === 0 && (
-        <p>No attendance records found for today.</p>
+        <p>No attendance records found for selected filters.</p>
       )}
 
       {!loading && !error && logs.length > 0 && (
