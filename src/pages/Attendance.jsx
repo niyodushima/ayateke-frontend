@@ -86,7 +86,7 @@ function Attendance() {
 
     try {
       await axios.put(
-        `${API_BASE}/api/attendance`,
+        `${API_BASE}/api/attendance/checkout`,
         {
           employee_id: employeeId,
           date: today,
@@ -204,5 +204,3 @@ const td = {
 };
 
 export default Attendance;
-
-
