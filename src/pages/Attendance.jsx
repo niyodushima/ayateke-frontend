@@ -17,11 +17,11 @@ function Attendance() {
   console.log('🔍 Logged in as:', user.email);
 
   function getTodayDate() {
-    return new Date().toLocaleDateString('en-CA', { timeZone: 'Africa/Kigali' }); // YYYY-MM-DD
+    return new Date().toLocaleDateString('en-CA', { timeZone: 'Africa/Kigali' });
   }
 
   function getCurrentTime() {
-    return new Date().toLocaleTimeString('en-GB', { hour12: false }).slice(0, 5); // HH:MM
+    return new Date().toLocaleTimeString('en-GB', { hour12: false }).slice(0, 5);
   }
 
   const fetchLogs = useCallback(async () => {
