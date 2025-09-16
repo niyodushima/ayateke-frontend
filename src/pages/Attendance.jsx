@@ -14,6 +14,8 @@ function Attendance() {
   const [searchTerm, setSearchTerm] = useState('');
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
+  console.log('🔍 Logged in as:', user.email);
+
   function getTodayDate() {
     return new Date().toLocaleDateString('en-CA', { timeZone: 'Africa/Kigali' }); // YYYY-MM-DD
   }
@@ -64,6 +66,7 @@ function Attendance() {
         },
         { headers: { 'Content-Type': 'application/json' }, withCredentials: true }
       );
+      alert('✅ Checked in successfully');
       await fetchLogs();
       triggerSidebarRefresh();
     } catch (err) {
@@ -91,6 +94,7 @@ function Attendance() {
         },
         { headers: { 'Content-Type': 'application/json' }, withCredentials: true }
       );
+      alert('✅ Checked out successfully');
       await fetchLogs();
       triggerSidebarRefresh();
     } catch (err) {
@@ -99,34 +103,61 @@ function Attendance() {
     }
   };
 
+  const alreadyCheckedIn = logs.some(
+    (log) => log.employee_id === user.email && log.date === getTodayDate()
+  );
+
   return (
     <div style={{ padding: '2rem', maxWidth: '1000px', margin: '0 auto' }}>
       <h2 style={{ marginBottom: '1rem' }}>📋 Attendance Logs</h2>
 
       <div style={{ marginBottom: '1rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-        <input
-          type="date"
-          value={selectedDate}
-          onChange={(e) => setSelectedDate(e.target.value)}
-          style={{ padding: '0.5rem' }}
-        />
-        <input
-          type="text"
-          placeholder="Search by employee ID/email"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          style={{ padding: '0.5rem', flex: '1' }}
-        />
-        <button onClick={fetchLogs} style={{ padding: '0.5rem 1rem' }}>Fetch</button>
+        <label style={{ display: 'flex', flexDirection: 'column' }}>
+          <span style={{ fontSize: '0.9rem', marginBottom: '0.3rem' }}>📅 Select Date</span>
+          <input
+            type="date"
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+            style={{ padding: '0.5rem' }}
+          />
+        </label>
+
+        <label style={{ display: 'flex', flexDirection: 'column', flex: '1' }}>
+          <span style={{ fontSize: '0.9rem', marginBottom: '0.3rem' }}>🔍 Employee Email</span>
+          <input
+            type="text"
+            placeholder="e.g. test@ayateke.com"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={{ padding: '0.5rem' }}
+          />
+        </label>
+
+        <div style={{ display: 'flex', alignItems: 'flex-end' }}>
+          <button onClick={fetchLogs} style={{ padding: '0.5rem 1rem' }}>Fetch</button>
+        </div>
       </div>
 
       <div style={{ marginBottom: '1rem', display: 'flex', gap: '1rem' }}>
-        <button onClick={handleCheckIn} style={{ padding: '0.5rem 1rem' }}>
+        <button
+          onClick={handleCheckIn}
+          disabled={alreadyCheckedIn}
+          style={{
+            padding: '0.5rem 1rem',
+            opacity: alreadyCheckedIn ? 0.6 : 1,
+            cursor: alreadyCheckedIn ? 'not-allowed' : 'pointer',
+          }}
+        >
           Check In
         </button>
         <button onClick={handleCheckOut} style={{ padding: '0.5rem 1rem' }}>
           Check Out
         </button>
+      </div>
+
+      <div style={{ marginBottom: '1rem', fontSize: '0.9rem', color: '#555' }}>
+        Showing logs for <strong>{selectedDate}</strong>
+        {searchTerm && <> — filtered by <strong>{searchTerm}</strong></>}
       </div>
 
       {loading && <p>Loading attendance records...</p>}
