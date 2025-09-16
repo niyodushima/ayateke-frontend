@@ -50,58 +50,59 @@ function Attendance() {
     return () => clearInterval(interval);
   }, [fetchLogs]);
 
-  const handleCheckIn = async () => {
-    const today = getTodayDate();
-    const clockInTime = getCurrentTime();
-    const employeeId = user.email || 'unknown@user';
+const handleCheckIn = async () => {
+  const today = getTodayDate();
+  const clockInTime = getCurrentTime();
+  const employeeId = user.email || 'unknown@user';
 
-    try {
-      await axios.post(
-        `${API_BASE}/api/attendance`,
-        {
-          employee_id: employeeId,
-          date: today,
-          clock_in: clockInTime,
-          clock_out: '00:00',
-        },
-        { headers: { 'Content-Type': 'application/json' }, withCredentials: true }
-      );
-      alert('✅ Checked in successfully');
-      await fetchLogs();
-      triggerSidebarRefresh();
-    } catch (err) {
-      console.error('Check-in failed:', err);
-      alert(
-        err.response?.data?.error ||
-          err.response?.data?.errors?.[0]?.msg ||
-          'Check-in failed'
-      );
-    }
-  };
+  try {
+    await axios.post(
+      `${API_BASE}/api/attendance`,
+      {
+        employee_id: employeeId,
+        date: today,
+        clock_in: clockInTime,
+        clock_out: '00:00',
+      },
+      { headers: { 'Content-Type': 'application/json' }, withCredentials: true }
+    );
+    alert('✅ Checked in successfully');
+    await fetchLogs();
+    triggerSidebarRefresh();
+  } catch (err) {
+    console.error('Check-in failed:', err);
+    alert(
+      err.response?.data?.error ||
+        err.response?.data?.errors?.[0]?.msg ||
+        'Check-in failed'
+    );
+  }
+};
+
 
   const handleCheckOut = async () => {
-    const today = getTodayDate();
-    const clockOutTime = getCurrentTime();
-    const employeeId = user.email || 'unknown@user';
+  const today = getTodayDate();
+  const clockOutTime = getCurrentTime();
+  const employeeId = user.email || 'unknown@user';
 
-    try {
-      await axios.put(
-        `${API_BASE}/api/attendance/checkout`,
-        {
-          employee_id: employeeId,
-          date: today,
-          clock_out: clockOutTime,
-        },
-        { headers: { 'Content-Type': 'application/json' }, withCredentials: true }
-      );
-      alert('✅ Checked out successfully');
-      await fetchLogs();
-      triggerSidebarRefresh();
-    } catch (err) {
-      console.error('Check-out failed:', err);
-      alert(err.response?.data?.error || 'Check-out failed');
-    }
-  };
+  try {
+    await axios.put(
+      `${API_BASE}/api/attendance/checkout`,
+      {
+        employee_id: employeeId,
+        date: today,
+        clock_out: clockOutTime,
+      },
+      { headers: { 'Content-Type': 'application/json' }, withCredentials: true }
+    );
+    alert('✅ Checked out successfully');
+    await fetchLogs();
+    triggerSidebarRefresh();
+  } catch (err) {
+    console.error('Check-out failed:', err);
+    alert(err.response?.data?.error || 'Check-out failed');
+  }
+};
 
   const alreadyCheckedIn = logs.some(
     (log) => log.employee_id === user.email && log.date === getTodayDate()
@@ -204,3 +205,4 @@ const td = {
 };
 
 export default Attendance;
+
