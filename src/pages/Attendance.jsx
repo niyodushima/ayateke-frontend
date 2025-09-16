@@ -1,4 +1,3 @@
-// src/pages/Attendance.jsx
 import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { triggerSidebarRefresh } from '../components/Sidebar';
@@ -13,16 +12,25 @@ function Attendance() {
   const [error, setError] = useState('');
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
+  const getTodayDate = () =>
+    new Date().toLocaleDateString('en-CA', { timeZone: 'Africa/Kigali' }); // YYYY-MM-DD
+
+  const getCurrentTime = () =>
+    new Date().toLocaleTimeString('en-GB', { hour12: false }).slice(0, 5); // HH:MM
+
   const fetchLogs = useCallback(async () => {
     setLoading(true);
     setError('');
-    const today = new Date().toISOString().split('T')[0];
+    const today = getTodayDate();
 
     try {
       const resToday = await axios.get(`${API_BASE}/api/attendance/today`, {
         withCredentials: true,
       });
       setLogs(Array.isArray(resToday.data) ? resToday.data : []);
+      if (!Array.isArray(resToday.data)) {
+        console.warn('Unexpected response format:', resToday.data);
+      }
     } catch (e1) {
       if (e1?.response?.status === 404) {
         try {
@@ -51,8 +59,8 @@ function Attendance() {
   }, [fetchLogs]);
 
   const handleCheckIn = async () => {
-    const today = new Date().toISOString().split('T')[0];
-    const clockInTime = new Date().toLocaleTimeString('en-GB', { hour12: false }).slice(0, 5);
+    const today = getTodayDate();
+    const clockInTime = getCurrentTime();
 
     try {
       await axios.post(
@@ -78,8 +86,8 @@ function Attendance() {
   };
 
   const handleCheckOut = async () => {
-    const today = new Date().toISOString().split('T')[0];
-    const clockOutTime = new Date().toLocaleTimeString('en-GB', { hour12: false }).slice(0, 5);
+    const today = getTodayDate();
+    const clockOutTime = getCurrentTime();
 
     try {
       await axios.put(
@@ -112,7 +120,9 @@ function Attendance() {
 
       {loading && <p>Loading attendance records...</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
-      {!loading && !error && logs.length === 0 && <p>No attendance records found for today.</p>}
+      {!loading && !error && logs.length === 0 && (
+        <p>No attendance records found for today.</p>
+      )}
 
       {!loading && !error && logs.length > 0 && (
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
