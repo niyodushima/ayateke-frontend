@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
-import { triggerSidebarRefresh } from '../components/Sidebar';
+import { triggerSidebarRefresh } from '../components/Sidebar'; // adjust path if needed
 
 const API_BASE =
   process.env.REACT_APP_API_URL?.replace(/\/$/, '') ||
@@ -10,38 +10,29 @@ function Attendance() {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [selectedDate, setSelectedDate] = useState(getTodayDate());
-  const [searchTerm, setSearchTerm] = useState('');
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
-  const employeeId = user?.email?.trim() || 'test@ayateke.com';
 
-  function getTodayDate() {
-    return new Date().toLocaleDateString('en-CA', { timeZone: 'Africa/Kigali' });
-  }
+  const employee_id = 'user@example.com'; // TODO: replace with dynamic user.email
 
-  function getCurrentTime() {
-    return new Date().toLocaleTimeString('en-GB', { hour12: false }).slice(0, 5);
-  }
+  const getTodayDate = () =>
+    new Date().toLocaleDateString('en-CA', { timeZone: 'Africa/Kigali' });
 
-  const fetchLogs = useCallback(async () => {
+  const getCurrentTime = () =>
+    new Date().toLocaleTimeString('en-GB', { hour12: false }).slice(0, 5);
+
+  const fetchLogs = useCallback(() => {
     setLoading(true);
     setError('');
-    try {
-      const res = await axios.get(`${API_BASE}/api/attendance`, {
-        params: {
-          date: selectedDate,
-          employee_id: searchTerm || undefined,
-        },
-        withCredentials: true,
-      });
-      setLogs(Array.isArray(res.data) ? res.data : []);
-    } catch (err) {
-      console.error('Error fetching attendance:', err);
-      setError('Failed to load attendance logs.');
-    } finally {
-      setLoading(false);
-    }
-  }, [selectedDate, searchTerm]);
+    axios
+      .get(`${API_BASE}/api/attendance/today`, { withCredentials: true })
+      .then((res) => {
+        setLogs(Array.isArray(res.data) ? res.data : []);
+      })
+      .catch((err) => {
+        console.error('Error fetching attendance:', err);
+        setError('Failed to load attendance logs.');
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
   useEffect(() => {
     fetchLogs();
@@ -50,13 +41,10 @@ function Attendance() {
   }, [fetchLogs]);
 
   const handleCheckIn = async () => {
-    const today = getTodayDate();
-    const clockInTime = getCurrentTime();
-
     const payload = {
-      employee_id: employeeId,
-      date: today,
-      clock_in: clockInTime,
+      employee_id,
+      date: getTodayDate(),
+      clock_in: getCurrentTime(),
       clock_out: '00:00',
     };
 
@@ -67,27 +55,18 @@ function Attendance() {
         headers: { 'Content-Type': 'application/json' },
         withCredentials: true,
       });
-      alert('✅ Checked in successfully');
-      await fetchLogs();
+      fetchLogs();
       triggerSidebarRefresh();
     } catch (err) {
       console.error('Check-in failed:', err);
-      alert(
-        err.response?.data?.error ||
-        err.response?.data?.errors?.[0]?.msg ||
-        'Check-in failed'
-      );
     }
   };
 
   const handleCheckOut = async () => {
-    const today = getTodayDate();
-    const clockOutTime = getCurrentTime();
-
     const payload = {
-      employee_id: employeeId,
-      date: today,
-      clock_out: clockOutTime,
+      employee_id,
+      date: getTodayDate(),
+      clock_out: getCurrentTime(),
     };
 
     console.log('📤 Check-out payload:', payload);
@@ -97,79 +76,32 @@ function Attendance() {
         headers: { 'Content-Type': 'application/json' },
         withCredentials: true,
       });
-      alert('✅ Checked out successfully');
-      await fetchLogs();
+      fetchLogs();
       triggerSidebarRefresh();
     } catch (err) {
       console.error('Check-out failed:', err);
-      alert(err.response?.data?.error || 'Check-out failed');
     }
   };
 
-  const alreadyCheckedIn = logs.some(
-    (log) => log.employee_id === employeeId && log.date === getTodayDate()
-  );
-
   return (
     <div style={{ padding: '2rem', maxWidth: '1000px', margin: '0 auto' }}>
-      <h2 style={{ marginBottom: '1rem' }}>📋 Attendance Logs</h2>
+      <h2 style={{ marginBottom: '1rem' }}>📋 Today's Attendance</h2>
 
-      <div style={{ marginBottom: '1rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-        <label style={{ display: 'flex', flexDirection: 'column' }}>
-          <span style={{ fontSize: '0.9rem', marginBottom: '0.3rem' }}>📅 Select Date</span>
-          <input
-            type="date"
-            value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
-            style={{ padding: '0.5rem' }}
-          />
-        </label>
-
-        <label style={{ display: 'flex', flexDirection: 'column', flex: '1' }}>
-          <span style={{ fontSize: '0.9rem', marginBottom: '0.3rem' }}>🔍 Employee Email</span>
-          <input
-            type="text"
-            placeholder="e.g. test@ayateke.com"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            style={{ padding: '0.5rem' }}
-          />
-        </label>
-
-        <div style={{ display: 'flex', alignItems: 'flex-end' }}>
-          <button onClick={fetchLogs} style={{ padding: '0.5rem 1rem' }}>Fetch</button>
-        </div>
-      </div>
-
-      <div style={{ marginBottom: '1rem', display: 'flex', gap: '1rem' }}>
-        <button
-          onClick={handleCheckIn}
-          disabled={alreadyCheckedIn}
-          style={{
-            padding: '0.5rem 1rem',
-            opacity: alreadyCheckedIn ? 0.6 : 1,
-            cursor: alreadyCheckedIn ? 'not-allowed' : 'pointer',
-          }}
-        >
+      <div style={{ marginBottom: '1rem' }}>
+        <button onClick={handleCheckIn} style={{ marginRight: '1rem' }}>
           Check In
         </button>
-        <button onClick={handleCheckOut} style={{ padding: '0.5rem 1rem' }}>
-          Check Out
-        </button>
-      </div>
-
-      <div style={{ marginBottom: '1rem', fontSize: '0.9rem', color: '#555' }}>
-        Showing logs for <strong>{selectedDate}</strong>
-        {searchTerm && <> — filtered by <strong>{searchTerm}</strong></>}
+        <button onClick={handleCheckOut}>Check Out</button>
       </div>
 
       {loading && <p>Loading attendance records...</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
-      {!loading && !error && Array.isArray(logs) && logs.length === 0 && (
-        <p>No attendance records found for selected filters.</p>
+
+      {!loading && !error && logs.length === 0 && (
+        <p>No attendance records found for today.</p>
       )}
 
-      {!loading && !error && Array.isArray(logs) && logs.length > 0 && (
+      {!loading && !error && logs.length > 0 && (
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ backgroundColor: '#f0f0f0' }}>
@@ -177,15 +109,37 @@ function Attendance() {
               <th style={th}>Date</th>
               <th style={th}>Clock-in</th>
               <th style={th}>Clock-out</th>
+              <th style={th}>Status</th>
             </tr>
           </thead>
           <tbody>
             {logs.map((log, index) => (
               <tr key={index} style={{ borderBottom: '1px solid #ddd' }}>
-                <td style={td}>{log.employee_id || log.email || '—'}</td>
+                <td style={td}>{log.employee_id || '—'}</td>
                 <td style={td}>{log.date || '—'}</td>
-                <td style={td}>{log.clock_in || log.checkIn || '—'}</td>
-                <td style={td}>{log.clock_out || log.checkOut || '—'}</td>
+                <td style={td}>{log.clock_in || '—'}</td>
+                <td style={td}>{log.clock_out || '—'}</td>
+                <td style={td}>
+                  <span
+                    style={{
+                      padding: '4px 8px',
+                      borderRadius: '6px',
+                      backgroundColor:
+                        log.clock_out && log.clock_out !== '00:00'
+                          ? '#c6f6d5'
+                          : '#fefcbf',
+                      color:
+                        log.clock_out && log.clock_out !== '00:00'
+                          ? '#22543d'
+                          : '#744210',
+                      fontWeight: 'bold',
+                    }}
+                  >
+                    {log.clock_out && log.clock_out !== '00:00'
+                      ? 'Completed'
+                      : 'Pending'}
+                  </span>
+                </td>
               </tr>
             ))}
           </tbody>
