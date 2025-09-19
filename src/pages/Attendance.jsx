@@ -59,7 +59,10 @@ function Attendance() {
       fetchLogs();
       triggerSidebarRefresh();
     } catch (err) {
-      console.error('Check-in failed:', err);
+      console.error('Check-in failed:', err.message);
+      if (err.response?.data?.error === 'Already checked in today') {
+        alert('⚠️ You’ve already checked in today.');
+      }
     }
   };
 
@@ -80,7 +83,8 @@ function Attendance() {
       fetchLogs();
       triggerSidebarRefresh();
     } catch (err) {
-      console.error('Check-out failed:', err);
+      console.error('Check-out failed:', err.message);
+      alert('⚠️ Check-out failed. Make sure you’ve checked in first.');
     }
   };
 
