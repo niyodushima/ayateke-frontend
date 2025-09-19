@@ -14,8 +14,6 @@ function Attendance() {
   const [searchTerm, setSearchTerm] = useState('');
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
-  console.log('🔍 Logged in as:', user.email);
-
   function getTodayDate() {
     return new Date().toLocaleDateString('en-CA', { timeZone: 'Africa/Kigali' });
   }
@@ -62,6 +60,7 @@ function Attendance() {
           employee_id: employeeId,
           date: today,
           clock_in: clockInTime,
+          clock_out: '00:00', // ✅ required by backend
         },
         { headers: { 'Content-Type': 'application/json' }, withCredentials: true }
       );
