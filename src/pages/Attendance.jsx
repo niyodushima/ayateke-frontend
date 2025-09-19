@@ -13,6 +13,7 @@ function Attendance() {
   const [selectedDate, setSelectedDate] = useState(getTodayDate());
   const [searchTerm, setSearchTerm] = useState('');
   const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const employeeId = user?.email?.trim() || 'test@ayateke.com';
 
   function getTodayDate() {
     return new Date().toLocaleDateString('en-CA', { timeZone: 'Africa/Kigali' });
@@ -51,19 +52,21 @@ function Attendance() {
   const handleCheckIn = async () => {
     const today = getTodayDate();
     const clockInTime = getCurrentTime();
-    const employeeId = user.email || 'unknown@user';
+
+    const payload = {
+      employee_id: employeeId,
+      date: today,
+      clock_in: clockInTime,
+      clock_out: '00:00',
+    };
+
+    console.log('📤 Check-in payload:', payload);
 
     try {
-      await axios.post(
-        `${API_BASE}/api/attendance/checkin`,
-        {
-          employee_id: employeeId,
-          date: today,
-          clock_in: clockInTime,
-          clock_out: '00:00', // ✅ required by backend
-        },
-        { headers: { 'Content-Type': 'application/json' }, withCredentials: true }
-      );
+      await axios.post(`${API_BASE}/api/attendance/checkin`, payload, {
+        headers: { 'Content-Type': 'application/json' },
+        withCredentials: true,
+      });
       alert('✅ Checked in successfully');
       await fetchLogs();
       triggerSidebarRefresh();
@@ -80,18 +83,20 @@ function Attendance() {
   const handleCheckOut = async () => {
     const today = getTodayDate();
     const clockOutTime = getCurrentTime();
-    const employeeId = user.email || 'unknown@user';
+
+    const payload = {
+      employee_id: employeeId,
+      date: today,
+      clock_out: clockOutTime,
+    };
+
+    console.log('📤 Check-out payload:', payload);
 
     try {
-      await axios.post(
-        `${API_BASE}/api/attendance/checkout`,
-        {
-          employee_id: employeeId,
-          date: today,
-          clock_out: clockOutTime,
-        },
-        { headers: { 'Content-Type': 'application/json' }, withCredentials: true }
-      );
+      await axios.post(`${API_BASE}/api/attendance/checkout`, payload, {
+        headers: { 'Content-Type': 'application/json' },
+        withCredentials: true,
+      });
       alert('✅ Checked out successfully');
       await fetchLogs();
       triggerSidebarRefresh();
@@ -102,7 +107,7 @@ function Attendance() {
   };
 
   const alreadyCheckedIn = logs.some(
-    (log) => log.employee_id === user.email && log.date === getTodayDate()
+    (log) => log.employee_id === employeeId && log.date === getTodayDate()
   );
 
   return (
