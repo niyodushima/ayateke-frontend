@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
-import { triggerSidebarRefresh } from '../components/Sidebar'; // adjust path if needed
+import { triggerSidebarRefresh } from '../components/Sidebar';
 
 const API_BASE =
   process.env.REACT_APP_API_URL?.replace(/\/$/, '') ||
@@ -11,9 +11,8 @@ function Attendance() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // ✅ Use dynamic user if available
   const user = JSON.parse(localStorage.getItem('user') || '{}');
-  const employee_id = user?.email?.trim() || 'user@example.com';
+  const employee_id = user?.email?.trim() || 'admin@ayateke.com';
 
   const getTodayDate = () =>
     new Date().toLocaleDateString('en-CA', { timeZone: 'Africa/Kigali' });
