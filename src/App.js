@@ -9,6 +9,8 @@ import StaffDashboard from './pages/StaffDashboard';
 import StaffTraining from './components/StaffTraining'; // ✅ moved to pages for consistency
 import StaffProfile from './components/StaffProfile';   // ✅ moved to pages for consistency
 import Branches from './pages/Branches';
+import LeaveRequest from './pages/LeaveRequest';        // ✅ staff leave request
+import LeaveDashboard from './pages/LeaveDashboard';    // ✅ admin leave dashboard
 
 // Layouts
 import DashboardLayout from './layouts/DashboardLayout';
@@ -47,10 +49,12 @@ function App() {
               <DashboardLayout />
             </ProtectedRoute>
           }
-        ><Route path="/admin/branches" element={<Branches />} />
+        >
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="training" element={<AdminTrainingDashboard />} />
-          <Route path="attendance" element={<Attendance />} /> {/* ✅ Attendance route */}
+          <Route path="attendance" element={<Attendance />} />
+          <Route path="branches" element={<Branches />} />
+          <Route path="leave-dashboard" element={<LeaveDashboard />} /> {/* ✅ Leave dashboard */}
         </Route>
 
         {/* Staff routes */}
@@ -65,6 +69,7 @@ function App() {
           <Route index element={<StaffDashboard />} />
           <Route path="profile" element={<StaffProfile />} />
           <Route path="training" element={<StaffTraining />} />
+          <Route path="leave-request" element={<LeaveRequest />} /> {/* ✅ Leave request */}
         </Route>
 
         {/* Catch-all */}
