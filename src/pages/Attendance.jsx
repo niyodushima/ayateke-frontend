@@ -11,7 +11,9 @@ function Attendance() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const employee_id = 'user@example.com'; // TODO: replace with dynamic user.email
+  // ✅ Use dynamic user if available
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const employee_id = user?.email?.trim() || 'user@example.com';
 
   const getTodayDate = () =>
     new Date().toLocaleDateString('en-CA', { timeZone: 'Africa/Kigali' });
@@ -48,7 +50,7 @@ function Attendance() {
       clock_out: '00:00',
     };
 
-    console.log('📤 Check-in payload:', payload);
+    console.log('📤 Check-in payload:', JSON.stringify(payload, null, 2));
 
     try {
       await axios.post(`${API_BASE}/api/attendance/checkin`, payload, {
@@ -69,7 +71,7 @@ function Attendance() {
       clock_out: getCurrentTime(),
     };
 
-    console.log('📤 Check-out payload:', payload);
+    console.log('📤 Check-out payload:', JSON.stringify(payload, null, 2));
 
     try {
       await axios.post(`${API_BASE}/api/attendance/checkout`, payload, {
