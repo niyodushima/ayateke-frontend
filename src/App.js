@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 // Pages
+import SalariesDashboard from './pages/SalariesDashboard'; // or './components/SalariesDashboard' if that's where it's saved
 import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminTrainingDashboard from './pages/AdminTrainingDashboard';
