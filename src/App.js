@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 // Pages
+import ContractsDashboard from './pages/ContractsDashboard';
 import SalariesDashboard from './pages/SalaryDashboard'; // or './components/SalariesDashboard' if that's where it's saved
 import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
@@ -57,6 +58,7 @@ function App() {
           <Route path="branches" element={<Branches />} />
           <Route path="leave-dashboard" element={<LeaveDashboard />} /> {/* ✅ Leave dashboard */}
         <Route path="payroll" element={<SalariesDashboard />} /> {/* ✅ Payroll route */}
+          <Route path="contracts" element={<ContractsDashboard />} />
 </Route>
 
         {/* Staff routes */}
