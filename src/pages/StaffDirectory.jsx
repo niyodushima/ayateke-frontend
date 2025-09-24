@@ -1,9 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 const StaffDirectory = () => {
   const [staff, setStaff] = useState([]);
-  const [filters, setFilters] = useState({ branch: '', role: '', status: '' });
+  const [filters, setFilters] = useState({
+    branch: '',
+    role: '',
+    status: '',
+  });
 
   const fetchStaff = async () => {
     try {
@@ -21,10 +26,10 @@ const StaffDirectory = () => {
   }, [filters]);
 
   return (
-    <div className="staff-directory">
-      <h2>🧑‍💼 Staff Directory</h2>
+    <div style={{ padding: '2rem' }}>
+      <h2 style={{ marginBottom: '1rem' }}>🧑‍💼 Staff Directory</h2>
 
-      <div className="filters">
+      <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
         <input
           type="text"
           placeholder="Filter by Branch"
@@ -45,24 +50,28 @@ const StaffDirectory = () => {
         />
       </div>
 
-      <table className="staff-table">
+      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Branch</th>
-            <th>Role</th>
-            <th>Status</th>
+          <tr style={{ backgroundColor: '#f0f0f0' }}>
+            <th style={{ padding: '0.5rem', border: '1px solid #ccc' }}>Name</th>
+            <th style={{ padding: '0.5rem', border: '1px solid #ccc' }}>Email</th>
+            <th style={{ padding: '0.5rem', border: '1px solid #ccc' }}>Branch</th>
+            <th style={{ padding: '0.5rem', border: '1px solid #ccc' }}>Role</th>
+            <th style={{ padding: '0.5rem', border: '1px solid #ccc' }}>Status</th>
           </tr>
         </thead>
         <tbody>
           {staff.map((s) => (
             <tr key={s.id}>
-              <td>{s.name}</td>
-              <td>{s.email}</td>
-              <td>{s.branch}</td>
-              <td>{s.role}</td>
-              <td>{s.status}</td>
+              <td style={{ padding: '0.5rem', border: '1px solid #ccc' }}>
+                <Link to={`/admin/staff/${s.id}`} style={{ color: 'teal', textDecoration: 'underline' }}>
+                  {s.name}
+                </Link>
+              </td>
+              <td style={{ padding: '0.5rem', border: '1px solid #ccc' }}>{s.email}</td>
+              <td style={{ padding: '0.5rem', border: '1px solid #ccc' }}>{s.branch}</td>
+              <td style={{ padding: '0.5rem', border: '1px solid #ccc' }}>{s.role}</td>
+              <td style={{ padding: '0.5rem', border: '1px solid #ccc' }}>{s.status}</td>
             </tr>
           ))}
         </tbody>
