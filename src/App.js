@@ -11,7 +11,7 @@ import AdminTrainingDashboard from './pages/AdminTrainingDashboard';
 import Attendance from './pages/Attendance';
 import StaffDashboard from './pages/StaffDashboard';
 import StaffTraining from './components/StaffTraining'; // ✅ moved to pages for consistency
-import StaffProfile from './components/StaffProfile';   // ✅ moved to pages for consistency
+   // ✅ moved to pages for consistency
 import Branches from './pages/Branches';
 import LeaveRequest from './pages/LeaveRequest';        // ✅ staff leave request
 import LeaveDashboard from './pages/LeaveDashboard';    // ✅ admin leave dashboard
