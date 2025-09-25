@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 // Pages
+import BranchManager from './pages/BranchManager';
 import StaffProfile from './pages/StaffProfile';
 import StaffDirectory from './pages/StaffDirectory';
 import ContractsDashboard from './pages/ContractsDashboard';
@@ -63,6 +64,7 @@ function App() {
           <Route path="contracts" element={<ContractsDashboard />} />
           <Route path="staff" element={<StaffDirectory />} />
           <Route path="staff/:id" element={<StaffProfile />} />
+           <Route path="branches" element={<BranchManager />} />
 </Route>
 
         {/* Staff routes */}
