@@ -10,6 +10,7 @@ const ContractsDashboard = () => {
     start_date: '',
     end_date: '',
     signed_by: '',
+    education: '',
   });
 
   const fetchContracts = async () => {
@@ -34,6 +35,7 @@ const ContractsDashboard = () => {
         start_date: '',
         end_date: '',
         signed_by: '',
+        education: '',
       });
       fetchContracts();
     } catch (err) {
@@ -104,6 +106,12 @@ const ContractsDashboard = () => {
           onChange={(e) => setForm({ ...form, signed_by: e.target.value })}
           required
         />
+        <input
+          type="text"
+          placeholder="Education Background"
+          value={form.education}
+          onChange={(e) => setForm({ ...form, education: e.target.value })}
+        />
         <button type="submit">Submit</button>
       </form>
 
@@ -111,22 +119,18 @@ const ContractsDashboard = () => {
         <thead>
           <tr>
             <th>Employee ID</th>
-            <th>Type</th>
-            <th>Start</th>
-            <th>End</th>
-            <th>Status</th>
-            <th>Signed By</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Education</th>
           </tr>
         </thead>
         <tbody>
-          {contracts.map((c) => (
-            <tr key={c.id}>
+          {contracts.map((c, index) => (
+            <tr key={index}>
               <td>{c.employee_id}</td>
-              <td>{c.type}</td>
               <td>{c.start_date}</td>
               <td>{c.end_date}</td>
-              <td>{c.status}</td>
-              <td>{c.signed_by}</td>
+              <td>{c.education}</td>
             </tr>
           ))}
         </tbody>
