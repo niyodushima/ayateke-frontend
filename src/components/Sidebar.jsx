@@ -136,8 +136,8 @@ const Sidebar = ({ onClose }) => {
   const adminNav = [
     { label: 'Dashboard', icon: FaHome, path: '/admin/dashboard' },
     //{ label: 'Staff Directory', icon: FaUsers, path: '/admin/staff', badge: stats.totalUsers },
-    //{ label: 'Branches', icon: FaCodeBranch, path: '/admin/branches' },
-    { label: 'Contracts', icon: FaFileContract, path: '/admin/contracts' },
+    { label: 'Branches', icon: FaCodeBranch, path: '/admin/branches' },
+    //{ label: 'Contracts', icon: FaFileContract, path: '/admin/contracts' },
     //{ label: 'Payroll', icon: FaMoneyBillWave, path: '/admin/payroll' },
     { label: 'Leave Requests', icon: FaCalendarAlt, path: '/admin/leave-dashboard', badge: stats.pendingLeaves },
     { label: 'Attendance', icon: FaCalendarCheck, path: '/admin/attendance', badge: stats.todayAttendance },
