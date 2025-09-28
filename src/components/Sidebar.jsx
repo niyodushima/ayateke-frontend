@@ -185,6 +185,10 @@ const Sidebar = ({ onClose }) => {
           <Text fontSize="sm" color="gray.500">{userRole.charAt(0).toUpperCase() + userRole.slice(1)}</Text>
         </Box>
       </Flex>
+      <Text fontSize="sm" color="gray.500" mb={2}>
+  Welcome back, {user?.name?.split(' ')[0] || 'Team'} 👋
+</Text>
+
 
       <VStack align="start" spacing={2}>
         {visibleItems.map((item, index) => (
