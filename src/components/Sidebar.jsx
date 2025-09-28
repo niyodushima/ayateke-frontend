@@ -197,7 +197,7 @@ const Sidebar = ({ onClose }) => {
                 px={3}
                 py={2}
                 borderRadius="md"
-                bg={isActive ? activeBg : 'transparent'}
+                bg={item.label === 'Career Growth' ? 'teal.100' : isActive ? activeBg : 'transparent'}
                 fontWeight={isActive ? 'bold' : 'normal'}
                 borderLeft={isActive ? `4px solid ${borderColor}` : '4px solid transparent'}
                 color={textColor}
