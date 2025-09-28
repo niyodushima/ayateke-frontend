@@ -233,4 +233,3 @@ const Sidebar = ({ onClose }) => {
 
 export default Sidebar;
 
-                borderLeft={isActive ? `4px solid ${borderColor}`
