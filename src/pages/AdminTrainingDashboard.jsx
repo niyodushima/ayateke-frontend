@@ -20,12 +20,13 @@ import {
   Button,
   FormControl,
   FormLabel,
+  HStack,
 } from '@chakra-ui/react';
 import { CheckCircleIcon, WarningIcon } from '@chakra-ui/icons';
 import { useState } from 'react';
 
 const AdminTrainingDashboard = () => {
-  const trainingData = [
+  const [trainingData, setTrainingData] = useState([
     {
       employee: 'nadine@ayateke.com',
       department: 'Engineering',
@@ -50,10 +51,12 @@ const AdminTrainingDashboard = () => {
         { title: 'Data Privacy', completed: false },
       ],
     },
-  ];
+  ]);
 
   const [departmentFilter, setDepartmentFilter] = useState('');
   const [employeeFilter, setEmployeeFilter] = useState('');
+  const [selectedEmp, setSelectedEmp] = useState('');
+  const [newTraining, setNewTraining] = useState('');
 
   const filteredData = trainingData.filter((user) => {
     const matchesDept = departmentFilter ? user.department === departmentFilter : true;
@@ -68,13 +71,41 @@ const AdminTrainingDashboard = () => {
   );
   const pendingModules = totalModules - completedModules;
 
+  const handleToggleStatus = (userIndex, trainingIndex) => {
+    const updated = [...trainingData];
+    updated[userIndex].trainings[trainingIndex].completed =
+      !updated[userIndex].trainings[trainingIndex].completed;
+    setTrainingData(updated);
+  };
+
+  const handleRemoveTraining = (userIndex, trainingIndex) => {
+    const updated = [...trainingData];
+    updated[userIndex].trainings.splice(trainingIndex, 1);
+    setTrainingData(updated);
+  };
+
+  const handleAddTraining = () => {
+    if (!selectedEmp || !newTraining.trim()) return;
+    const updated = trainingData.map((user) => {
+      if (user.employee === selectedEmp) {
+        return {
+          ...user,
+          trainings: [...user.trainings, { title: newTraining.trim(), completed: false }],
+        };
+      }
+      return user;
+    });
+    setTrainingData(updated);
+    setNewTraining('');
+  };
+
   return (
     <Box p={{ base: 4, md: 8 }} bg="gray.50" minH="100vh">
       <Heading size="lg" color="blue.700" mb={2}>
         Career Growth Dashboard
       </Heading>
       <Text fontSize="md" color="gray.600" mb={6}>
-        Track employee training progress and suggest new learning opportunities.
+        Track and manage employee training progress.
       </Text>
 
       <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6} mb={8}>
@@ -114,6 +145,7 @@ const AdminTrainingDashboard = () => {
             <Th>Department</Th>
             <Th>Training Module</Th>
             <Th>Status</Th>
+            <Th>Actions</Th>
           </Tr>
         </Thead>
         <Tbody>
@@ -137,6 +169,25 @@ const AdminTrainingDashboard = () => {
                     {module.completed ? 'Completed' : 'Pending'}
                   </Badge>
                 </Td>
+                <Td>
+                  <HStack spacing={2}>
+                    <Button
+                      size="xs"
+                      colorScheme="blue"
+                      onClick={() => handleToggleStatus(i, j)}
+                    >
+                      Toggle
+                    </Button>
+                    <Button
+                      size="xs"
+                      colorScheme="gray"
+                      variant="outline"
+                      onClick={() => handleRemoveTraining(i, j)}
+                    >
+                      Remove
+                    </Button>
+                  </HStack>
+                </Td>
               </Tr>
             ))
           )}
@@ -145,19 +196,31 @@ const AdminTrainingDashboard = () => {
 
       <Divider my={8} />
 
-      <Heading size="md" mb={4}>Suggest a New Training Topic</Heading>
+      <Heading size="md" mb={4}>Add Training Module</Heading>
+      <FormControl mb={4}>
+        <FormLabel>Select Employee</FormLabel>
+        <Select placeholder="Choose employee" onChange={(e) => setSelectedEmp(e.target.value)}>
+          {trainingData.map((user) => (
+            <option key={user.employee} value={user.employee}>{user.employee}</option>
+          ))}
+        </Select>
+      </FormControl>
       <FormControl mb={4}>
         <FormLabel>Training Title</FormLabel>
-        <Input placeholder="e.g. Advanced Excel or Leadership Skills" />
+        <Input
+          placeholder="e.g. Leadership Skills"
+          value={newTraining}
+          onChange={(e) => setNewTraining(e.target.value)}
+        />
       </FormControl>
-      <Button colorScheme="teal">Submit Request</Button>
+      <Button colorScheme="teal" onClick={handleAddTraining}>Add Training</Button>
 
       <VStack mt={8} spacing={2} align="start">
         <Text fontSize="sm" color="gray.600">
-          ✅ Completed modules help unlock new roles and responsibilities.
+          ✅ HR can now manage training modules directly from this dashboard.
         </Text>
         <Text fontSize="xs" color="gray.500">
-          This dashboard is mock-driven. Future updates will include reminders, analytics, and calendar integration.
+          This is mock-driven. Backend integration will allow saving changes permanently.
         </Text>
       </VStack>
     </Box>
