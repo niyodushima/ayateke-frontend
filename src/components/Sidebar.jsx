@@ -199,7 +199,7 @@ const Sidebar = ({ onClose }) => {
                 borderRadius="md"
                 bg={isActive ? activeBg : 'transparent'}
                 fontWeight={isActive ? 'bold' : 'normal'}
-                borderLeft={isActive ? `                borderLeft={isActive ? `4px solid ${borderColor}` : '4px solid transparent'}
+                borderLeft={isActive ? `4px solid ${borderColor}` : '4px solid transparent'}
                 color={textColor}
                 _hover={{ bg: hoverBg, cursor: 'pointer' }}
                 transition="all 0.2s ease"
