@@ -211,8 +211,8 @@ const Sidebar = ({ onClose }) => {
                 </Flex>
                 {typeof item.badge === 'number' && item.badge > 0 && (
                   <Badge colorScheme="teal" borderRadius="md" title={`${item.label} count`}>
-  {item.badge}
-</Badge>
+                   {item.badge}
+                  </Badge>
                 )}
               </Flex>
             )}
