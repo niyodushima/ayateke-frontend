@@ -15,11 +15,16 @@ import {
   StatLabel,
   StatNumber,
   SimpleGrid,
+  Select,
+  Input,
+  Button,
+  FormControl,
+  FormLabel,
 } from '@chakra-ui/react';
 import { CheckCircleIcon, WarningIcon } from '@chakra-ui/icons';
+import { useState } from 'react';
 
 const AdminTrainingDashboard = () => {
-  // 🔧 Mock training data
   const trainingData = [
     {
       employee: 'nadine@ayateke.com',
@@ -47,7 +52,15 @@ const AdminTrainingDashboard = () => {
     },
   ];
 
-  // 📊 Calculate summary stats
+  const [departmentFilter, setDepartmentFilter] = useState('');
+  const [employeeFilter, setEmployeeFilter] = useState('');
+
+  const filteredData = trainingData.filter((user) => {
+    const matchesDept = departmentFilter ? user.department === departmentFilter : true;
+    const matchesEmp = employeeFilter ? user.employee.includes(employeeFilter) : true;
+    return matchesDept && matchesEmp;
+  });
+
   const totalModules = trainingData.reduce((sum, user) => sum + user.trainings.length, 0);
   const completedModules = trainingData.reduce(
     (sum, user) => sum + user.trainings.filter((t) => t.completed).length,
@@ -61,7 +74,7 @@ const AdminTrainingDashboard = () => {
         Career Growth Dashboard
       </Heading>
       <Text fontSize="md" color="gray.600" mb={6}>
-        Track employee training progress and identify areas for development.
+        Track employee training progress and suggest new learning opportunities.
       </Text>
 
       <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6} mb={8}>
@@ -81,6 +94,19 @@ const AdminTrainingDashboard = () => {
 
       <Divider mb={6} />
 
+      <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} mb={4}>
+        <Select placeholder="Filter by department" onChange={(e) => setDepartmentFilter(e.target.value)}>
+          <option value="Engineering">Engineering</option>
+          <option value="Finance">Finance</option>
+          <option value="Operations">Operations</option>
+        </Select>
+        <Input
+          placeholder="Search by employee email"
+          value={employeeFilter}
+          onChange={(e) => setEmployeeFilter(e.target.value)}
+        />
+      </SimpleGrid>
+
       <Table variant="striped" colorScheme="gray" size="sm">
         <Thead bg="gray.100">
           <Tr>
@@ -91,7 +117,7 @@ const AdminTrainingDashboard = () => {
           </Tr>
         </Thead>
         <Tbody>
-          {trainingData.map((user, i) =>
+          {filteredData.map((user, i) =>
             user.trainings.map((module, j) => (
               <Tr key={`${i}-${j}`}>
                 <Td>{user.employee}</Td>
@@ -117,12 +143,21 @@ const AdminTrainingDashboard = () => {
         </Tbody>
       </Table>
 
+      <Divider my={8} />
+
+      <Heading size="md" mb={4}>Suggest a New Training Topic</Heading>
+      <FormControl mb={4}>
+        <FormLabel>Training Title</FormLabel>
+        <Input placeholder="e.g. Advanced Excel or Leadership Skills" />
+      </FormControl>
+      <Button colorScheme="teal">Submit Request</Button>
+
       <VStack mt={8} spacing={2} align="start">
         <Text fontSize="sm" color="gray.600">
           ✅ Completed modules help unlock new roles and responsibilities.
         </Text>
         <Text fontSize="xs" color="gray.500">
-          This dashboard is mock-driven. Future updates will include filtering, reminders, and analytics.
+          This dashboard is mock-driven. Future updates will include reminders, analytics, and calendar integration.
         </Text>
       </VStack>
     </Box>
