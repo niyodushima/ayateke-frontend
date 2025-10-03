@@ -174,7 +174,7 @@ const Sidebar = ({ onClose }) => {
       </Flex>
 
       <Flex align="center" gap={3} mb={6}>
-        <Avatar size="sm" name={user?.name || 'User'} />
+        <Avatar size="sm" name={user?.name || 'Admin'} />
         <Box>
           <Text fontWeight="medium" color={textColor}>{user?.name || 'ADMIN'}</Text>
           <Text fontSize="sm" color="gray.500">{userRole.charAt(0).toUpperCase() + userRole.slice(1)}</Text>
