@@ -25,7 +25,7 @@ const Sidebar = ({ onClose }) => {
   const textColor = useColorModeValue('gray.800', 'white');
 
   const user = useMemo(() => JSON.parse(localStorage.getItem('user') || 'null'), []);
-  const userRole = user?.role || 'staff';
+  const userRole = user?.role || 'ADMIN';
 
   const API_BASE = process.env.REACT_APP_API_URL?.replace(/\/$/, '') || 'https://ayateke-backend.onrender.com';
 
@@ -134,24 +134,19 @@ const Sidebar = ({ onClose }) => {
   }, [load]);
 
   const adminNav = [
-    { label: 'Dashboard', icon: FaHome, path: '/admin/dashboard' },
-    { label: 'Career Growth', icon: FaChalkboardTeacher, path: '/admin/training', badge: stats.trainings },
-    // { label: 'Staff Directory', icon: FaUsers, path: '/admin/staff', badge: stats.totalUsers },
-    { label: 'Branches', icon: FaCodeBranch, path: '/admin/branches' },
-    // { label: 'Contracts', icon: FaFileContract, path: '/admin/contracts' },
-    // { label: 'Payroll', icon: FaMoneyBillWave, path: '/admin/payroll' },
-    { label: 'Leave Requests', icon: FaCalendarAlt, path: '/admin/leave-dashboard', badge: stats.pendingLeaves },
-    // { label: 'Attendance', icon: FaCalendarCheck, path: '/admin/attendance', badge: stats.todayAttendance },
-    { label: 'Settings', icon: FaCog, path: '/admin/settings' },
-  ];
-
+  { label: 'Dashboard', icon: FaHome, path: '/admin/dashboard' },
+  { label: 'Trainings', icon: FaChalkboardTeacher, path: '/admin/training', badge: stats.trainings },
+  { label: 'Branches', icon: FaCodeBranch, path: '/admin/branches' },
+  { label: 'Attendance', icon: FaCalendarCheck, path: '/admin/attendance', badge: stats.todayAttendance },
+  { label: 'Settings', icon: FaCog, path: '/admin/settings' },
+];
   const staffNav = [
-    { label: 'Dashboard', icon: FaHome, path: '/staff' },
-    { label: 'Career Growth', icon: FaChalkboardTeacher, path: '/staff/training', badge: stats.trainings },
-    { label: 'Submit Leave', icon: FaEdit, path: '/staff/leave-request' },
-    { label: 'My Leave History', icon: FaCalendarCheck, path: '/staff/leaves', badge: stats.myPendingLeaves },
-    { label: 'Profile', icon: FaUserCircle, path: '/staff/profile' },
-  ];
+  { label: 'Dashboard', icon: FaHome, path: '/staff' },
+  { label: 'Trainings', icon: FaChalkboardTeacher, path: '/staff/training', badge: stats.trainings },
+  { label: 'Submit Leave', icon: FaEdit, path: '/staff/leave-request' },
+  { label: 'My Leave History', icon: FaCalendarCheck, path: '/staff/leaves', badge: stats.myPendingLeaves },
+  { label: 'Profile', icon: FaUserCircle, path: '/staff/profile' },
+];
 
   const visibleItems = userRole === 'admin' ? adminNav : staffNav;
 
