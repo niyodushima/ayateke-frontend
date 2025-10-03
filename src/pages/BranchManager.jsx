@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import {
+  Box, Heading, Table, Thead, Tbody, Tr, Th, Td,
+  Input, Button, VStack, Text, TableContainer
+} from '@chakra-ui/react';
 
 const API = 'https://ayateke-backend.onrender.com/api/branches';
 
 const BranchManager = () => {
   const [branches, setBranches] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [newEntries, setNewEntries] = useState({}); // for adding schemeManagers/plumbers
+  const [newEntries, setNewEntries] = useState({});
 
   const fetchBranches = async () => {
     try {
@@ -45,64 +49,112 @@ const BranchManager = () => {
     }
   };
 
-  if (loading) return <p>Loading branches...</p>;
+  if (loading) return <Text p={8}>Loading branches...</Text>;
 
   return (
-    <div style={{ padding: '2rem' }}>
-      <h2>🏢 Branch Manager</h2>
+    <Box p={8}>
+      <Heading mb={6}>🏢 Branch Manager</Heading>
+
       {branches.map((branch) => (
-        <div key={branch.branch} style={{ marginBottom: '2rem' }}>
-          <h3>{branch.branch}</h3>
+        <Box key={branch.branch} mb={10}>
+          <Heading size="md" mb={4}>{branch.branch}</Heading>
 
-          <h4>Staff</h4>
-          <ul>
-            {branch.staff.map((s) => (
-              <li key={s.id}>
-                {s.role} —{' '}
-                <input
-                  type="text"
-                  value={s.name}
-                  placeholder="Unassigned"
-                  onChange={(e) => handleStaffNameChange(branch.branch, s.id, e.target.value)}
-                />
-              </li>
-            ))}
-          </ul>
+          {/* Staff Table */}
+          <Heading size="sm" mb={2}>Staff</Heading>
+          <TableContainer mb={4}>
+            <Table variant="simple" size="sm">
+              <Thead>
+                <Tr>
+                  <Th>Role</Th>
+                  <Th>Name</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {branch.staff.map((s) => (
+                  <Tr key={s.id}>
+                    <Td>{s.role}</Td>
+                    <Td>
+                      <Input
+                        size="sm"
+                        value={s.name}
+                        placeholder="Unassigned"
+                        onChange={(e) =>
+                          handleStaffNameChange(branch.branch, s.id, e.target.value)
+                        }
+                      />
+                    </Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+          </TableContainer>
 
-          <h4>Scheme Managers</h4>
-          <ul>
-            {branch.schemeManagers.map((m) => (
-              <li key={m.id}>{m.name}</li>
-            ))}
-          </ul>
-          <input
-            type="text"
-            placeholder="Add scheme manager"
-            value={newEntries[`${branch.branch}-schemeManagers`] || ''}
-            onChange={(e) =>
-              setNewEntries({ ...newEntries, [`${branch.branch}-schemeManagers`]: e.target.value })
-            }
-          />
-          <button onClick={() => handleAddEntry(branch.branch, 'schemeManagers')}>Add</button>
+          {/* Scheme Managers Table */}
+          <Heading size="sm" mb={2}>Scheme Managers</Heading>
+          <TableContainer mb={2}>
+            <Table variant="simple" size="sm">
+              <Thead>
+                <Tr>
+                  <Th>Name</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {branch.schemeManagers.map((m) => (
+                  <Tr key={m.id}>
+                    <Td>{m.name}</Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+          </TableContainer>
+          <VStack align="start" mb={6}>
+            <Input
+              size="sm"
+              placeholder="Add scheme manager"
+              value={newEntries[`${branch.branch}-schemeManagers`] || ''}
+              onChange={(e) =>
+                setNewEntries({ ...newEntries, [`${branch.branch}-schemeManagers`]: e.target.value })
+              }
+            />
+            <Button size="sm" colorScheme="teal" onClick={() => handleAddEntry(branch.branch, 'schemeManagers')}>
+              Add Scheme Manager
+            </Button>
+          </VStack>
 
-          <h4>Plumbers</h4>
-          <ul>
-            {branch.plumbers.map((p) => (
-              <li key={p.id}>{p.name}</li>
-            ))}
-          </ul>
-          <input
-            type="text"
-            placeholder="Add plumber"
-            value={newEntries[`${branch.branch}-plumbers`] || ''}
-            onChange={(e) =>
-              setNewEntries({ ...newEntries, [`${branch.branch}-plumbers`]: e.target.value })
-            }
-          />
-          <button onClick={() => handleAddEntry(branch.branch, 'plumbers')}>Add</button>
-        </div>
+          {/* Plumbers Table */}
+          <Heading size="sm" mb={2}>Plumbers</Heading>
+          <TableContainer mb={2}>
+            <Table variant="simple" size="sm">
+              <Thead>
+                <Tr>
+                  <Th>Name</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {branch.plumbers.map((p) => (
+                  <Tr key={p.id}>
+                    <Td>{p.name}</Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+          </TableContainer>
+          <VStack align="start">
+            <Input
+              size="sm"
+              placeholder="Add plumber"
+              value={newEntries[`${branch.branch}-plumbers`] || ''}
+              onChange={(e) =>
+                setNewEntries({ ...newEntries, [`${branch.branch}-plumbers`]: e.target.value })
+              }
+            />
+            <Button size="sm" colorScheme="blue" onClick={() => handleAddEntry(branch.branch, 'plumbers')}>
+              Add Plumber
+            </Button>
+          </VStack>
+        </Box>
       ))}
-    </div>
+    </Box>
   );
 };
 
