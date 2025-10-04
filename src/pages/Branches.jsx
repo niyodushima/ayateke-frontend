@@ -71,10 +71,70 @@ function AddForm({ branchName, onSubmit }) {
   const [address, setAddress] = useState('');
 
   const roleMap = {
-    'Head Office': [/* your roles */],
-    'Kirehe Branch': [/* your roles */],
-    'Gatsibo Branch': [/* your roles */],
-    'Mahama Water Treatment Plant': [/* your roles */]
+    'Head Office': [
+      'Managing Director',
+      'Permanent Secretary',
+      'Director of Finance and Administration',
+      'Logistician and Store Keeper',
+      'Chief Accountant',
+      'Human Resource Officer',
+      'Internal Auditor',
+      'Tax Officer',
+      'IT Officer',
+      'Chief Driver',
+      'Accountant',
+      'Electromechanician',
+      'Assistant Chief Driver',
+      'Driver',
+      'Cleaner'
+    ],
+    'Kirehe Branch': [
+      'Branch Manager',
+      'Head of Technical Team',
+      'Chief Recovery Officer',
+      'Field Inspection Officer',
+      'Electromechanician',
+      'Accountant',
+      'Recovery Officer',
+      'Store Keeper and Cashier',
+      'Scheme Manager & Driver',
+      'Scheme Manager',
+      'Pump Operator',
+      'Plumber & Driver',
+      'Plumber',
+      'Plumber Assistant',
+      'Chlorine Mixer',
+      'Driver Vehicle',
+      'Driver Moto',
+      'Cleaner',
+      'Security Guard'
+    ],
+    'Gatsibo Branch': [
+      'Branch Manager',
+      'Head of Technical Team',
+      'Billing and Recovery Monitor',
+      'Scheme Manager & Driver',
+      'Scheme Manager',
+      'Plumber & Driver',
+      'Plumber',
+      'Pump Operator',
+      'Driver Vehicle',
+      'Driver Moto',
+      'Security Guard',
+      'Cleaner'
+    ],
+    'Mahama Water Treatment Plant': [
+      'Water Treatment Plant Manager',
+      'Water Supply Engineer',
+      'Accountant',
+      'Electromechanician',
+      'Water Quality Engineer',
+      'Electromechanic Engineer',
+      'Assistant Electromechanician',
+      'Pump Operator',
+      'Driver Vehicle',
+      'Laboratory Operator'
+    ]
   };
 
   const availableRoles = roleMap[branchName] || [];
@@ -134,20 +194,12 @@ export default function Branches() {
     try {
       const res = await axios.post(`${API_BASE}/api/branches/${encodeURIComponent(branchName)}/roles`, payload);
       const newEntry = res.data?.data;
-
       setBranches((prev) =>
-        prev.map((b) => {
-          if (b.branch !== branchName) return b;
-
-          const filtered = (b.roles || []).filter(
-            (r) => r.role !== newEntry.role && r.id !== newEntry.id
-          );
-
-          return {
-            ...b,
-            roles: [newEntry, ...filtered]
-          };
-        })
+        prev.map((b) =>
+          b.branch === branchName
+            ? { ...b, roles: [...(b.roles || []), newEntry] }
+            : b
+        )
       );
     } catch (err) {
       console.error('Add entry failed:', err);
@@ -183,11 +235,11 @@ export default function Branches() {
 
   const filterRows = (rows) => {
     if (!searchTerm) return rows;
-    const term = searchTerm.toLowerCase();
+        const term = searchTerm.toLowerCase();
     return (rows || []).filter((r) =>
       r.role.toLowerCase().includes(term) ||
       (r.name || '').toLowerCase().includes(term) ||
-            (r.email || '').toLowerCase().includes(term) ||
+      (r.email || '').toLowerCase().includes(term) ||
       (r.tel || '').toLowerCase().includes(term) ||
       (r.address || '').toLowerCase().includes(term)
     );
