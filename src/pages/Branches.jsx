@@ -1,4 +1,3 @@
-// src/pages/Branches.jsx
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
@@ -21,7 +20,7 @@ function Section({ title, children }) {
   );
 }
 
-function Table({ columns, rows, onDelete, onUpdate, isStaff }) {
+function Table({ columns, rows, onDelete, onUpdate }) {
   return (
     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
       <thead>
@@ -33,21 +32,15 @@ function Table({ columns, rows, onDelete, onUpdate, isStaff }) {
         </tr>
       </thead>
       <tbody>
-        {rows.length === 0 && (
+        {(!Array.isArray(rows) || rows.length === 0) && (
           <tr>
             <td colSpan={columns.length + 1} style={td}>No records</td>
           </tr>
         )}
-        {rows.map((r) => (
+        {(rows || []).map((r) => (
           <tr key={r.id} style={{ borderBottom: '1px solid #e2e8f0' }}>
-            {isStaff ? (
-              <>
-                <td style={td}>{r.role}</td>
-                <td style={td}>{r.name || '—'}</td>
-              </>
-            ) : (
-              <td style={td}>{r.name}</td>
-            )}
+            <td style={td}>{r.role}</td>
+            <td style={td}>{r.name || '—'}</td>
             <td style={td}>
               <button onClick={() => onUpdate(r)} style={{ marginRight: 8 }}>Edit</button>
               <button
@@ -64,7 +57,7 @@ function Table({ columns, rows, onDelete, onUpdate, isStaff }) {
   );
 }
 
-function AddForm({ isStaff, onSubmit }) {
+function AddForm({ onSubmit }) {
   const [role, setRole] = useState('Branch Manager');
   const [name, setName] = useState('');
 
@@ -78,17 +71,15 @@ function AddForm({ isStaff, onSubmit }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(isStaff ? { role, name } : { name });
+    onSubmit({ role, name });
     setName('');
   };
 
   return (
     <form onSubmit={handleSubmit} style={{ display: 'flex', gap: 8, margin: '10px 0' }}>
-      {isStaff && (
-        <select value={role} onChange={(e) => setRole(e.target.value)}>
-          {staffRoles.map((r) => <option key={r} value={r}>{r}</option>)}
-        </select>
-      )}
+      <select value={role} onChange={(e) => setRole(e.target.value)}>
+        {staffRoles.map((r) => <option key={r} value={r}>{r}</option>)}
+      </select>
       <input
         type="text"
         placeholder="Name"
@@ -125,11 +116,9 @@ export default function Branches() {
     load();
   }, []);
 
-  const addEntry = async (branchName, tableName, payload) => {
+  const addEntry = async (branchName, payload) => {
     try {
-      await axios.post(`${API_BASE}/api/branches/${branchName}/${tableName}`, payload, {
-        headers: { 'Content-Type': 'application/json' },
-      });
+      await axios.post(`${API_BASE}/api/branches/${encodeURIComponent(branchName)}/roles`, payload);
       await load();
     } catch (err) {
       console.error('Add entry failed:', err);
@@ -137,10 +126,10 @@ export default function Branches() {
     }
   };
 
-  const deleteEntry = async (branchName, tableName, id) => {
+  const deleteEntry = async (branchName, id) => {
     if (!window.confirm('Delete this entry?')) return;
     try {
-      await axios.delete(`${API_BASE}/api/branches/${branchName}/${tableName}/${id}`);
+      await axios.delete(`${API_BASE}/api/branches/${encodeURIComponent(branchName)}/roles/${id}`);
       await load();
     } catch (err) {
       console.error('Delete entry failed:', err);
@@ -148,17 +137,14 @@ export default function Branches() {
     }
   };
 
-  const updateEntry = async (branchName, tableName, record) => {
+  const updateEntry = async (branchName, record) => {
     const newName = window.prompt('Update name:', record.name || '');
     if (newName === null) return;
 
-    const payload = tableName === 'staff'
-      ? { name: newName, role: record.role }
-      : { name: newName };
-
     try {
-      await axios.put(`${API_BASE}/api/branches/${branchName}/${tableName}/${record.id}`, payload, {
-        headers: { 'Content-Type': 'application/json' },
+      await axios.put(`${API_BASE}/api/branches/${encodeURIComponent(branchName)}/roles/${record.id}`, {
+        name: newName,
+        role: record.role
       });
       await load();
     } catch (err) {
@@ -167,13 +153,11 @@ export default function Branches() {
     }
   };
 
-  const filterRows = (rows, isStaff) => {
+  const filterRows = (rows) => {
     if (!searchTerm) return rows;
     const term = searchTerm.toLowerCase();
-    return rows.filter((r) =>
-      isStaff
-        ? r.role.toLowerCase().includes(term) || (r.name || '').toLowerCase().includes(term)
-        : (r.name || '').toLowerCase().includes(term)
+    return (rows || []).filter((r) =>
+      r.role.toLowerCase().includes(term) || (r.name || '').toLowerCase().includes(term)
     );
   };
 
@@ -206,39 +190,13 @@ export default function Branches() {
 
       {filteredBranches.map((b) => (
         <Section key={b.branch} title={`${b.branch} Branch`}>
-          <div style={{ marginBottom: 24 }}>
-            <h3 style={{ marginBottom: 8 }}>Staff</h3>
-            <AddForm isStaff onSubmit={(payload) => addEntry(b.branch, 'staff', payload)} />
-            <Table
-              columns={['Role', 'Name']}
-              rows={filterRows(b.staff, true)}
-              isStaff
-              onDelete={(id) => deleteEntry(b.branch, 'staff', id)}
-              onUpdate={(record) => updateEntry(b.branch, 'staff', record)}
-            />
-          </div>
-
-          <div style={{ marginBottom: 24 }}>
-            <h3 style={{ marginBottom: 8 }}>Scheme Managers</h3>
-            <AddForm isStaff={false} onSubmit={(payload) => addEntry(b.branch, 'schemeManagers', payload)} />
-            <Table
-              columns={['Name']}
-              rows={filterRows(b.schemeManagers, false)}
-              onDelete={(id) => deleteEntry(b.branch, 'schemeManagers', id)}
-              onUpdate={(record) => updateEntry(b.branch, 'schemeManagers', record)}
-            />
-          </div>
-
-          <div>
-            <h3 style={{ marginBottom: 8 }}>Plumbers</h3>
-            <AddForm isStaff={false} onSubmit={(payload) => addEntry(b.branch, 'plumbers', payload)} />
-                        <Table
-              columns={['Name']}
-              rows={filterRows(b.plumbers, false)}
-              onDelete={(id) => deleteEntry(b.branch, 'plumbers', id)}
-              onUpdate={(record) => updateEntry(b.branch, 'plumbers', record)}
-            />
-          </div>
+          <AddForm onSubmit={(payload) => addEntry(b.branch, payload)} />
+          <Table
+            columns={['Role', 'Name']}
+            rows={filterRows(b.roles)}
+            onDelete={(id) => deleteEntry(b.branch, id)}
+            onUpdate={(record) => updateEntry(b.branch, record)}
+          />
         </Section>
       ))}
     </div>
