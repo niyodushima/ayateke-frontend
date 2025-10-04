@@ -235,9 +235,9 @@ export default function Branches() {
 
   const filterRows = (rows) => {
     if (!searchTerm) return rows;
-    const term = searchTerm.toLowerCase();
+        const term = searchTerm.toLowerCase();
     return (rows || []).filter((r) =>
-      r.role.toLowerCase().      r.role.toLowerCase().includes(term) ||
+      r.role.toLowerCase().includes(term) ||
       (r.name || '').toLowerCase().includes(term) ||
       (r.email || '').toLowerCase().includes(term) ||
       (r.tel || '').toLowerCase().includes(term) ||
