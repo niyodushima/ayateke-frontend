@@ -254,4 +254,28 @@ export default function Branches() {
           {branches.map((b) => (
             <option key={b.branch} value={b.branch}>{b.branch}</option>
           ))}
-        </select>
+                </select>
+      </div>
+
+      {filteredBranches.map((b) => {
+        const unassignedCount = (b.roles || []).filter((r) => !r.name || r.name.trim() === '').length;
+
+        return (
+          <Section key={b.branch} title={`${b.branch} Branch`}>
+            <p style={{ fontSize: 14, color: '#718096', marginBottom: 8 }}>
+              Unassigned roles: <strong>{unassignedCount}</strong>
+            </p>
+            <AddForm branchName={b.branch} onSubmit={(payload) => addEntry(b.branch, payload)} />
+            <Table
+              columns={['Role', 'Name']}
+              rows={filterRows(b.roles)}
+              onDelete={(id) => deleteEntry(b.branch, id)}
+              onUpdate={(record) => updateEntry(b.branch, record)}
+            />
+          </Section>
+        );
+      })}
+    </div>
+  );
+}
+
