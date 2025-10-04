@@ -259,4 +259,19 @@ export default function Branches() {
 
         return (
           <Section key={b.branch} title={`${b.branch} Branch`}>
-            <p style={{ fontSize: 14, color: '#718096', marginBottom
+            <p style={{ fontSize: 14, color: '#718096', marginBottom: 8 }}>
+              Unassigned roles: <strong>{unassignedCount}</strong>
+            </p>
+            <AddForm branchName={b.branch} onSubmit={(payload) => addEntry(b.branch, payload)} />
+            <Table
+              columns={['Role', 'Name']}
+              rows={filterRows(b.roles)}
+              onDelete={(id) => deleteEntry(b.branch, id)}
+              onUpdate={(record) => updateEntry(b.branch, record)}
+            />
+          </Section>
+        );
+      })}
+    </div>
+  );
+}
