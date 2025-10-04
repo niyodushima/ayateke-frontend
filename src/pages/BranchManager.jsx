@@ -2,15 +2,13 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import {
   Box, Heading, Table, Thead, Tbody, Tr, Th, Td,
-  Input, Button, VStack, Text, TableContainer
+  Input, Button, Text, TableContainer
 } from '@chakra-ui/react';
 
 const API = 'https://ayateke-backend.onrender.com/api/branches';
-const HEAD_OFFICE_API = 'https://ayateke-backend.onrender.com/api/head-office';
 
 const BranchManager = () => {
   const [branches, setBranches] = useState([]);
-  const [headOffice, setHeadOffice] = useState([]);
   const [loading, setLoading] = useState(true);
   const [newEntries, setNewEntries] = useState({});
 
@@ -20,50 +18,37 @@ const BranchManager = () => {
       setBranches(res.data);
     } catch (err) {
       console.error('Error fetching branches:', err.message);
-    }
-  };
-
-  const fetchHeadOffice = async () => {
-    try {
-      const res = await axios.get(HEAD_OFFICE_API);
-      setHeadOffice(res.data.positions); // assuming { positions: [...] }
-    } catch (err) {
-      console.error('Error fetching head office:', err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    Promise.all([fetchBranches(), fetchHeadOffice()]).finally(() => setLoading(false));
+    fetchBranches();
   }, []);
 
-  const handleStaffNameChange = async (branchName, staffId, name) => {
+  const handleRoleNameChange = async (branchName, roleId, name) => {
     try {
-      await axios.put(`${API}/${branchName}/staff/${staffId}`, { name });
+      await axios.put(`${API}/${encodeURIComponent(branchName)}/roles/${roleId}`, { name });
       fetchBranches();
     } catch (err) {
-      console.error('Error updating staff name:', err.message);
+      console.error('Error updating role name:', err.message);
     }
   };
 
-  const handleAddEntry = async (branchName, tableName) => {
-    const name = newEntries[`${branchName}-${tableName}`];
-    if (!name) return;
+  const handleAddRole = async (branchName) => {
+    const key = `${branchName}-new-role`;
+    const role = newEntries[key]?.role;
+    const name = newEntries[key]?.name;
+
+    if (!role) return;
 
     try {
-      await axios.post(`${API}/${branchName}/${tableName}`, { name });
-      setNewEntries({ ...newEntries, [`${branchName}-${tableName}`]: '' });
+      await axios.post(`${API}/${encodeURIComponent(branchName)}/roles`, { role, name });
+      setNewEntries({ ...newEntries, [key]: { role: '', name: '' } });
       fetchBranches();
     } catch (err) {
-      console.error('Error adding entry:', err.message);
-    }
-  };
-
-  const handleHeadOfficeNameChange = async (positionId, name) => {
-    try {
-      await axios.put(`${HEAD_OFFICE_API}/positions/${positionId}`, { name });
-      fetchHeadOffice();
-    } catch (err) {
-      console.error('Error updating head office name:', err.message);
+      console.error('Error adding role:', err.message);
     }
   };
 
@@ -73,45 +58,12 @@ const BranchManager = () => {
     <Box p={8}>
       <Heading mb={6}>🏢 Branch Manager</Heading>
 
-      {/* Head Office Section */}
-      <Box mb={10}>
-        <Heading size="md" mb={4}>Head Office</Heading>
-        <TableContainer mb={4}>
-          <Table variant="simple" size="sm">
-            <Thead>
-              <Tr>
-                <Th>Role</Th>
-                <Th>Name</Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {headOffice.map((pos) => (
-                <Tr key={pos.id}>
-                  <Td>{pos.role}</Td>
-                  <Td>
-                    <Input
-                      size="sm"
-                      value={pos.name || ''}
-                      placeholder="Unassigned"
-                      onChange={(e) =>
-                        handleHeadOfficeNameChange(pos.id, e.target.value)
-                      }
-                    />
-                  </Td>
-                </Tr>
-              ))}
-            </Tbody>
-          </Table>
-        </TableContainer>
-      </Box>
-
-      {/* Branches Section */}
       {branches.map((branch) => (
         <Box key={branch.branch} mb={10}>
           <Heading size="md" mb={4}>{branch.branch}</Heading>
 
-          {/* Staff Table */}
-          <Heading size="sm" mb={2}>Staff</Heading>
+          {/* Roles Table */}
+          <Heading size="sm" mb={2}>Staff Roles</Heading>
           <TableContainer mb={4}>
             <Table variant="simple" size="sm">
               <Thead>
@@ -121,16 +73,16 @@ const BranchManager = () => {
                 </Tr>
               </Thead>
               <Tbody>
-                {branch.staff.map((s) => (
-                  <Tr key={s.id}>
-                    <Td>{s.role}</Td>
+                {branch.roles.map((r) => (
+                  <Tr key={r.id}>
+                    <Td>{r.role}</Td>
                     <Td>
                       <Input
                         size="sm"
-                        value={s.name}
                         placeholder="Unassigned"
+                        value={r.name || ''}
                         onChange={(e) =>
-                          handleStaffNameChange(branch.branch, s.id, e.target.value)
+                          handleRoleNameChange(branch.branch, r.id, e.target.value)
                         }
                       />
                     </Td>
@@ -140,69 +92,47 @@ const BranchManager = () => {
             </Table>
           </TableContainer>
 
-          {/* Scheme Managers Table */}
-          <Heading size="sm" mb={2}>Scheme Managers</Heading>
-          <TableContainer mb={2}>
-            <Table variant="simple" size="sm">
-              <Thead>
-                <Tr>
-                  <Th>Name</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {branch.schemeManagers.map((m) => (
-                  <Tr key={m.id}>
-                    <Td>{m.name}</Td>
-                  </Tr>
-                ))}
-              </Tbody>
-            </Table>
-          </TableContainer>
-          <VStack align="start" mb={6}>
+          {/* Add New Role */}
+          <Heading size="sm" mb={2}>Add Role</Heading>
+          <Box mb={4}>
             <Input
               size="sm"
-              placeholder="Add scheme manager"
-              value={newEntries[`${branch.branch}-schemeManagers`] || ''}
+              placeholder="Role title"
+              value={newEntries[`${branch.branch}-new-role`]?.role || ''}
               onChange={(e) =>
-                setNewEntries({ ...newEntries, [`${branch.branch}-schemeManagers`]: e.target.value })
+                setNewEntries({
+                  ...newEntries,
+                  [`${branch.branch}-new-role`]: {
+                    ...newEntries[`${branch.branch}-new-role`],
+                    role: e.target.value
+                  }
+                })
               }
+              mb={2}
             />
-            <Button size="sm" colorScheme="teal" onClick={() => handleAddEntry(branch.branch, 'schemeManagers')}>
-              Add Scheme Manager
-            </Button>
-          </VStack>
-
-          {/* Plumbers Table */}
-          <Heading size="sm" mb={2}>Plumbers</Heading>
-          <TableContainer mb={2}>
-            <Table variant="simple" size="sm">
-              <Thead>
-                <Tr>
-                  <Th>Name</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {branch.plumbers.map((p) => (
-                  <Tr key={p.id}>
-                    <Td>{p.name}</Td>
-                  </Tr>
-                ))}
-              </Tbody>
-            </Table>
-          </TableContainer>
-          <VStack align="start">
             <Input
               size="sm"
-              placeholder="Add plumber"
-              value={newEntries[`${branch.branch}-plumbers`] || ''}
+              placeholder="Assigned name (optional)"
+              value={newEntries[`${branch.branch}-new-role`]?.name || ''}
               onChange={(e) =>
-                setNewEntries({ ...newEntries, [`${branch.branch}-plumbers`]: e.target.value })
+                setNewEntries({
+                  ...newEntries,
+                  [`${branch.branch}-new-role`]: {
+                    ...newEntries[`${branch.branch}-new-role`],
+                    name: e.target.value
+                  }
+                })
               }
+              mb={2}
             />
-            <Button size="sm" colorScheme="blue" onClick={() => handleAddEntry(branch.branch, 'plumbers')}>
-              Add Plumber
+            <Button
+              size="sm"
+              colorScheme="teal"
+              onClick={() => handleAddRole(branch.branch)}
+            >
+              + Add Role
             </Button>
-          </VStack>
+          </Box>
         </Box>
       ))}
     </Box>
