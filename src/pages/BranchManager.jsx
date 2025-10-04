@@ -5,7 +5,7 @@ import {
   Input, Button, Text, TableContainer
 } from '@chakra-ui/react';
 
-const API = 'https://ayateke-backend.onrender.com/api/branches';
+const API = 'https://ayateke-backend.onrender.com/api';
 
 const BranchManager = () => {
   const [branches, setBranches] = useState([]);
