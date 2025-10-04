@@ -186,14 +186,24 @@ export default function Branches() {
   }, []);
 
   const addEntry = async (branchName, payload) => {
-    try {
-      await axios.post(`${API_BASE}/api/branches/${encodeURIComponent(branchName)}/roles`, payload);
-      await load();
-    } catch (err) {
-      console.error('Add entry failed:', err);
-      alert(err.response?.data?.error || 'Add failed');
-    }
-  };
+  try {
+    const res = await axios.post(`${API_BASE}/api/branches/${encodeURIComponent(branchName)}/roles`, payload);
+    const newEntry = res.data?.data;
+
+    // Optimistically update local state
+    setBranches((prev) =>
+      prev.map((b) =>
+        b.branch === branchName
+          ? { ...b, roles: [...(b.roles || []), newEntry] }
+          : b
+      )
+    );
+  } catch (err) {
+    console.error('Add entry failed:', err);
+    alert(err.response?.data?.error || 'Add failed');
+  }
+};
+
 
   const deleteEntry = async (branchName, id) => {
     if (!window.confirm('Delete this entry?')) return;
