@@ -6,9 +6,11 @@ import {
 } from '@chakra-ui/react';
 
 const API = 'https://ayateke-backend.onrender.com/api/branches';
+const HEAD_OFFICE_API = 'https://ayateke-backend.onrender.com/api/head-office';
 
 const BranchManager = () => {
   const [branches, setBranches] = useState([]);
+  const [headOffice, setHeadOffice] = useState([]);
   const [loading, setLoading] = useState(true);
   const [newEntries, setNewEntries] = useState({});
 
@@ -18,13 +20,20 @@ const BranchManager = () => {
       setBranches(res.data);
     } catch (err) {
       console.error('Error fetching branches:', err.message);
-    } finally {
-      setLoading(false);
+    }
+  };
+
+  const fetchHeadOffice = async () => {
+    try {
+      const res = await axios.get(HEAD_OFFICE_API);
+      setHeadOffice(res.data.positions); // assuming { positions: [...] }
+    } catch (err) {
+      console.error('Error fetching head office:', err.message);
     }
   };
 
   useEffect(() => {
-    fetchBranches();
+    Promise.all([fetchBranches(), fetchHeadOffice()]).finally(() => setLoading(false));
   }, []);
 
   const handleStaffNameChange = async (branchName, staffId, name) => {
@@ -49,12 +58,54 @@ const BranchManager = () => {
     }
   };
 
+  const handleHeadOfficeNameChange = async (positionId, name) => {
+    try {
+      await axios.put(`${HEAD_OFFICE_API}/positions/${positionId}`, { name });
+      fetchHeadOffice();
+    } catch (err) {
+      console.error('Error updating head office name:', err.message);
+    }
+  };
+
   if (loading) return <Text p={8}>Loading branches...</Text>;
 
   return (
     <Box p={8}>
       <Heading mb={6}>🏢 Branch Manager</Heading>
 
+      {/* Head Office Section */}
+      <Box mb={10}>
+        <Heading size="md" mb={4}>Head Office</Heading>
+        <TableContainer mb={4}>
+          <Table variant="simple" size="sm">
+            <Thead>
+              <Tr>
+                <Th>Role</Th>
+                <Th>Name</Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {headOffice.map((pos) => (
+                <Tr key={pos.id}>
+                  <Td>{pos.role}</Td>
+                  <Td>
+                    <Input
+                      size="sm"
+                      value={pos.name || ''}
+                      placeholder="Unassigned"
+                      onChange={(e) =>
+                        handleHeadOfficeNameChange(pos.id, e.target.value)
+                      }
+                    />
+                  </Td>
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
+        </TableContainer>
+      </Box>
+
+      {/* Branches Section */}
       {branches.map((branch) => (
         <Box key={branch.branch} mb={10}>
           <Heading size="md" mb={4}>{branch.branch}</Heading>
