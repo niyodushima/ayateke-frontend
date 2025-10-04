@@ -57,20 +57,86 @@ function Table({ columns, rows, onDelete, onUpdate }) {
   );
 }
 
-function AddForm({ onSubmit }) {
-  const [role, setRole] = useState('Branch Manager');
+function AddForm({ branchName, onSubmit }) {
+  const [role, setRole] = useState('');
   const [name, setName] = useState('');
 
-  const staffRoles = [
-    'Branch Manager',
-    'Managing Director',
-    'Human Resource',
-    'Director Administrative of Finance',
-    'Accountant',
-  ];
+  const roleMap = {
+    'Head Office': [
+      'Managing Director',
+      'Permanent Secretary',
+      'Director of Finance and Administration',
+      'Logistician and Store Keeper',
+      'Chief Accountant',
+      'Human Resource Officer',
+      'Internal Auditor',
+      'Tax Officer',
+      'IT Officer',
+      'Chief Driver',
+      'Accountant',
+      'Electromechanician',
+      'Assistant Chief Driver',
+      'Driver',
+      'Cleaner'
+    ],
+    'Kirehe Branch': [
+      'Branch Manager',
+      'Head of Technical Team',
+      'Chief Recovery Officer',
+      'Field Inspection Officer',
+      'Electromechanician',
+      'Accountant',
+      'Recovery Officer',
+      'Store Keeper and Cashier',
+      'Scheme Manager & Driver',
+      'Scheme Manager',
+      'Pump Operator',
+      'Plumber & Driver',
+      'Plumber',
+      'Plumber Assistant',
+      'Chlorine Mixer',
+      'Driver Vehicle',
+      'Driver Moto',
+      'Cleaner',
+      'Security Guard'
+    ],
+    'Gatsibo Branch': [
+      'Branch Manager',
+      'Head of Technical Team',
+      'Billing and Recovery Monitor',
+      'Scheme Manager & Driver',
+      'Scheme Manager',
+      'Plumber & Driver',
+      'Plumber',
+      'Pump Operator',
+      'Driver Vehicle',
+      'Driver Moto',
+      'Security Guard',
+      'Cleaner'
+    ],
+    'Mahama Water Treatment Plant': [
+      'Water Treatment Plant Manager',
+      'Water Supply Engineer',
+      'Accountant',
+      'Electromechanician',
+      'Water Quality Engineer',
+      'Electromechanic Engineer',
+      'Assistant Electromechanician',
+      'Pump Operator',
+      'Driver Vehicle',
+      'Laboratory Operator'
+    ]
+  };
+
+  const availableRoles = roleMap[branchName] || [];
+
+  useEffect(() => {
+    setRole(availableRoles[0] || '');
+  }, [branchName]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!role) return;
     onSubmit({ role, name });
     setName('');
   };
@@ -78,7 +144,7 @@ function AddForm({ onSubmit }) {
   return (
     <form onSubmit={handleSubmit} style={{ display: 'flex', gap: 8, margin: '10px 0' }}>
       <select value={role} onChange={(e) => setRole(e.target.value)}>
-        {staffRoles.map((r) => <option key={r} value={r}>{r}</option>)}
+        {availableRoles.map((r) => <option key={r} value={r}>{r}</option>)}
       </select>
       <input
         type="text"
@@ -193,22 +259,4 @@ export default function Branches() {
 
         return (
           <Section key={b.branch} title={`${b.branch} Branch`}>
-            <p style={{ fontSize: 14, color: '#718096', marginBottom: 8 }}>
-              Unassigned roles: <strong>{unassignedCount}</strong>
-            </p>
-            <AddForm onSubmit={(payload) => addEntry(b.branch, payload)} />
-            <Table
-              columns={['Role', 'Name']}
-              rows={filterRows(b.roles)}
-              onDelete={(id) => deleteEntry(b.branch, id)}
-              onUpdate={(record) => updateEntry(b.branch, record)}
-            />
-          </Section>
-        );
-      })}
-    </div>
-  );
-}
-
-const th = { textAlign: 'left', padding: 10, borderBottom: '2px solid #cbd5e0' };
-const td = { padding: 10, verticalAlign: 'top' };
+            <p style={{ fontSize: 14, color: '#718096', marginBottom
