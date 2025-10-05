@@ -23,7 +23,7 @@ function Section({ title, children }) {
   );
 }
 
-function Table({ columns, rows, onDelete, onUpdate }) {
+function Table({ columns, rows, onDelete, onUpdate, onUpload }) {
   return (
     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
       <thead>
@@ -41,23 +41,40 @@ function Table({ columns, rows, onDelete, onUpdate }) {
           </tr>
         )}
         {(rows || []).map((r) => (
-          <tr key={r.id} style={{ borderBottom: '1px solid #e2e8f0' }}>
-            <td style={td}>{r.role}</td>
-            <td style={td}>{r.name || '—'}</td>
-            <td style={td}>{r.email || '—'}</td>
-            <td style={td}>{r.tel || '—'}</td>
-            <td style={td}>{r.address || '—'}</td>
-            <td style={td}>{r.gender || '—'}</td>
-            <td style={td}>
-              <button onClick={() => onUpdate(r)} style={{ marginRight: 8 }}>Edit</button>
-              <button
-                onClick={() => onDelete(r.id)}
-                style={{ color: 'white', background: '#e53e3e', border: 'none', padding: '6px 10px', borderRadius: 4 }}
-              >
-                Delete
-              </button>
-            </td>
-          </tr>
+          <React.Fragment key={r.id}>
+            <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
+              <td style={td}>{r.role}</td>
+              <td style={td}>{r.name || '—'}</td>
+              <td style={td}>{r.email || '—'}</td>
+              <td style={td}>{r.tel || '—'}</td>
+              <td style={td}>{r.address || '—'}</td>
+              <td style={td}>{r.gender || '—'}</td>
+              <td style={td}>
+                <button onClick={() => onUpdate(r)} style={{ marginRight: 8 }}>Edit</button>
+                <button
+                  onClick={() => onDelete(r.id)}
+                  style={{ color: 'white', background: '#e53e3e', border: 'none', padding: '6px 10px', borderRadius: 4 }}
+                >
+                  Delete
+                </button>
+                <button onClick={() => onUpload(r)} style={{ marginLeft: 8 }}>Upload Doc</button>
+              </td>
+            </tr>
+            {r.documents?.length > 0 && (
+              <tr>
+                <td colSpan={columns.length + 1} style={{ background: '#f9fafb', padding: '6px 10px' }}>
+                  <strong>Documents:</strong>
+                  <ul style={{ margin: '6px 0' }}>
+                    {r.documents.map((doc) => (
+                      <li key={doc.id}>
+                        {doc.name} ({doc.type}) — {new Date(doc.uploadedAt).toLocaleDateString()}
+                      </li>
+                    ))}
+                  </ul>
+                </td>
+              </tr>
+            )}
+          </React.Fragment>
         ))}
       </tbody>
     </table>
@@ -181,13 +198,31 @@ export default function Branches() {
     if (newName === null) return;
     try {
       await axios.put(`${API_BASE}/api/branches/${encodeURIComponent(branchName)}/roles/${record.id}`, {
-        name: newName,
-        role: record.role
+        name: newName,        role: record.role
       });
       await load();
     } catch (err) {
       console.error('Update entry failed:', err);
       alert(err.response?.data?.error || 'Update failed');
+    }
+  };
+
+  const uploadDocument = async (record) => {
+    const name = window.prompt('Document name (e.g. CV, ID, Contract):');
+    if (!name) return;
+
+    const type = window.prompt('Document type (PDF, DOCX, JPG):');
+    if (!type) return;
+
+    try {
+      await axios.post(`${API_BASE}/api/branches/${encodeURIComponent(record.branch)}/roles/${record.id}/documents`, {
+        name,
+        type
+      });
+      await load();
+    } catch (err) {
+      console.error('Upload failed:', err);
+      alert(err.response?.data?.error || 'Upload failed');
     }
   };
 
@@ -200,7 +235,7 @@ export default function Branches() {
       (r.email || '').toLowerCase().includes(term) ||
       (r.tel || '').toLowerCase().includes(term) ||
       (r.address || '').toLowerCase().includes(term) ||
-            (r.gender || '').toLowerCase().includes(term)
+      (r.gender || '').toLowerCase().includes(term)
     );
   };
 
@@ -241,9 +276,10 @@ export default function Branches() {
             <AddForm branchName={b.branch} onSubmit={(payload) => addEntry(b.branch, payload)} />
             <Table
               columns={['Role', 'Name', 'Email', 'Tel', 'Address', 'Gender']}
-              rows={filterRows(b.roles)}
+              rows={filterRows(b.roles.map((r) => ({ ...r, branch: b.branch })))}
               onDelete={(id) => deleteEntry(b.branch, id)}
               onUpdate={(record) => updateEntry(b.branch, record)}
+              onUpload={(record) => uploadDocument(record)}
             />
           </Section>
         );
@@ -251,3 +287,4 @@ export default function Branches() {
     </div>
   );
 }
+
