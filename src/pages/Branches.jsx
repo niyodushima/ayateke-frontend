@@ -134,9 +134,18 @@ function AddForm({ branchName, onSubmit }) {
       'Pump Operator',
       'Driver Vehicle',
       'Laboratory Operator'
-    ]
-  };
-
+    ],
+    'WATERAID PROJECT': [
+      'Site Engineer',
+      'Assistant Site Engineer',
+      'Pipe Welder Technician',
+      'Project Accountant',
+      'Driver Vehicle',
+      'Cashier & Store Keeper',
+      'Store Keeper & Pointeur'
+      ]
+   };
+ 
   const availableRoles = roleMap[branchName] || [];
 
   useEffect(() => {
