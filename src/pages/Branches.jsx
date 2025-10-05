@@ -82,8 +82,10 @@ function AddForm({ branchName, onSubmit }) {
   const availableRoles = roleMap[branchName] || [];
 
   useEffect(() => {
-    setRole(availableRoles[0] || '');
-  }, [branchName]);
+    if (availableRoles.length > 0) {
+      setRole(availableRoles[0]);
+    }
+  }, [availableRoles]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -98,8 +100,17 @@ function AddForm({ branchName, onSubmit }) {
 
   return (
     <form onSubmit={handleSubmit} style={{ display: 'flex', flexWrap: 'wrap', gap: 8, margin: '10px 0' }}>
-      <select value={role} onChange={(e) => setRole(e.target.value)} required>
-        {availableRoles.map((r) => <option key={r} value={r}>{r}</option>)}
+      <select
+        value={role}
+        onChange={(e) => setRole(e.target.value)}
+        required
+        disabled={availableRoles.length === 0}
+      >
+        {availableRoles.length === 0 ? (
+          <option value="">No roles available</option>
+        ) : (
+          availableRoles.map((r) => <option key={r} value={r}>{r}</option>)
+        )}
       </select>
       <input type="text" placeholder="Name" required value={name} onChange={(e) => setName(e.target.value)} style={{ flex: 1, padding: 6 }} />
       <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} style={{ flex: 1, padding: 6 }} />
@@ -205,7 +216,7 @@ export default function Branches() {
   if (loading) return <div style={{ padding: 20 }}>Loading branches...</div>;
 
   return (
-       <div style={{ padding: 20, maxWidth: 1200, margin: '0 auto' }}>
+    <div style={{ padding: 20, maxWidth: 1200, margin: '0 auto' }}>
       <h2 style={{ marginBottom: 16 }}>Ayateke Branches</h2>
 
       <div style={{ display: 'flex', gap: 10, marginBottom: 20 }}>
