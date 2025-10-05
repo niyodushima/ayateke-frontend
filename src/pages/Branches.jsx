@@ -1,4 +1,27 @@
-// ... (unchanged imports and constants)
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+
+const th = { textAlign: 'left', padding: 10, borderBottom: '2px solid #cbd5e0' };
+const td = { padding: 10, verticalAlign: 'top' };
+
+const API_BASE =
+  process.env.REACT_APP_API_URL?.replace(/\/$/, '') ||
+  'https://ayateke-backend.onrender.com';
+
+function Section({ title, children }) {
+  const [open, setOpen] = useState(true);
+  return (
+    <div style={{ marginBottom: '1.5rem', border: '1px solid #e2e8f0', borderRadius: 8 }}>
+      <div
+        onClick={() => setOpen(!open)}
+        style={{ padding: '10px 14px', cursor: 'pointer', background: '#f7fafc', fontWeight: 600 }}
+      >
+        {title} {open ? '▼' : '►'}
+      </div>
+      {open && <div style={{ padding: 14 }}>{children}</div>}
+    </div>
+  );
+}
 
 function Table({ columns, rows, onDelete, onUpdate }) {
   return (
@@ -24,7 +47,7 @@ function Table({ columns, rows, onDelete, onUpdate }) {
             <td style={td}>{r.email || '—'}</td>
             <td style={td}>{r.tel || '—'}</td>
             <td style={td}>{r.address || '—'}</td>
-            <td style={td}>{r.gender || '—'}</td> {/* ✅ Added gender column */}
+            <td style={td}>{r.gender || '—'}</td>
             <td style={td}>
               <button onClick={() => onUpdate(r)} style={{ marginRight: 8 }}>Edit</button>
               <button
@@ -47,14 +70,22 @@ function AddForm({ branchName, onSubmit }) {
   const [email, setEmail] = useState('');
   const [tel, setTel] = useState('');
   const [address, setAddress] = useState('');
-  const [gender, setGender] = useState(''); // ✅ Added gender state
+  const [gender, setGender] = useState('');
 
   const roleMap = {
-    'Head Office': [/* unchanged */],
-    'Kirehe Branch': [/* unchanged */],
-    'Gatsibo Branch': [/* unchanged */],
-    'Mahama Water Treatment Plant': [/* unchanged */],
-    'WATERAID PROJECT': [/* unchanged */]
+    'Head Office': [/* your roles */],
+    'Kirehe Branch': [/* your roles */],
+    'Gatsibo Branch': [/* your roles */],
+    'Mahama Water Treatment Plant': [/* your roles */],
+    'WATERAID PROJECT': [
+      'Site Engineer',
+      'Assistant Site Engineer',
+      'Pipe Welder Technician',
+      'Project Accountant',
+      'Driver Vehicle',
+      'Cashier & Store Keeper',
+      'Store Keeper & Pointeur'
+    ]
   };
 
   const availableRoles = roleMap[branchName] || [];
@@ -66,7 +97,7 @@ function AddForm({ branchName, onSubmit }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!role) return;
-    onSubmit({ role, name, email, tel, address, gender }); // ✅ Include gender
+    onSubmit({ role, name, email, tel, address, gender });
     setName('');
     setEmail('');
     setTel('');
@@ -76,7 +107,7 @@ function AddForm({ branchName, onSubmit }) {
 
   return (
     <form onSubmit={handleSubmit} style={{ display: 'flex', flexWrap: 'wrap', gap: 8, margin: '10px 0' }}>
-      <select value={role} onChange={(e) => setRole(e.target.value)}>
+      <select value={role} onChange={(e) => setRole(e.target.value)} required>
         {availableRoles.map((r) => <option key={r} value={r}>{r}</option>)}
       </select>
       <input type="text" placeholder="Name" required value={name} onChange={(e) => setName(e.target.value)} style={{ flex: 1, padding: 6 }} />
@@ -125,11 +156,8 @@ export default function Branches() {
       setBranches((prev) =>
         prev.map((b) => {
           if (b.branch !== branchName) return b;
-          const filtered = (b.roles || []).filter((r) => r.role !== newEntry.role);
-          return {
-            ...b,
-            roles: [newEntry, ...filtered]
-          };
+          const filtered = (b.roles || []).filter((r) => r.role !== newEntry.role && r.id !== newEntry.id);
+          return { ...b, roles: [newEntry, ...filtered] };
         })
       );
     } catch (err) {
@@ -177,7 +205,7 @@ export default function Branches() {
     );
   };
 
-  const filteredBranches = branches.filter((b) =>
+    const filteredBranches = branches.filter((b) =>
     branchFilter === 'All' ? true : b.branch === branchFilter
   );
 
@@ -204,7 +232,7 @@ export default function Branches() {
       </div>
 
       {filteredBranches.map((b) => {
-                const unassignedCount = (b.roles || []).filter((r) => !r.name || r.name.trim() === '').length;
+        const unassignedCount = (b.roles || []).filter((r) => !r.name || r.name.trim() === '').length;
 
         return (
           <Section key={b.branch} title={`${b.branch} Branch`}>
@@ -213,7 +241,7 @@ export default function Branches() {
             </p>
             <AddForm branchName={b.branch} onSubmit={(payload) => addEntry(b.branch, payload)} />
             <Table
-              columns={['Role', 'Name', 'Email', 'Tel', 'Address', 'Gender']} // ✅ Gender column added
+              columns={['Role', 'Name', 'Email', 'Tel', 'Address', 'Gender']}
               rows={filterRows(b.roles)}
               onDelete={(id) => deleteEntry(b.branch, id)}
               onUpdate={(record) => updateEntry(b.branch, record)}
