@@ -79,8 +79,11 @@ function AddForm({ branchName, onSubmit }) {
     'Mahama Water Treatment Plant': [/* your roles */]
   };
 
-  const normalizedBranch = branchName.trim();
-  const availableRoles = roleMap[normalizedBranch] || ['Custom Role'];
+  const normalizedBranch = branchName.trim().toLowerCase();
+  const roleMapNormalized = Object.fromEntries(
+    Object.entries(roleMap).map(([key, val]) => [key.trim().toLowerCase(), val])
+  );
+  const availableRoles = roleMapNormalized[normalizedBranch] || ['Custom Role'];
 
   useEffect(() => {
     if (availableRoles.length > 0) {
@@ -197,11 +200,10 @@ export default function Branches() {
       (r.email || '').toLowerCase().includes(term) ||
       (r.tel || '').toLowerCase().includes(term) ||
       (r.address || '').toLowerCase().includes(term) ||
-      (r.gender || '').toLowerCase().includes(term)
-    );
+      (r.gender || '').toLowerCase().includes(term    );
   };
 
-    const filteredBranches = branches.filter((b) =>
+  const filteredBranches = branches.filter((b) =>
     branchFilter === 'All' ? true : b.branch === branchFilter
   );
 
