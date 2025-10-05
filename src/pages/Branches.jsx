@@ -93,7 +93,8 @@ function AddForm({ branchName, onSubmit }) {
     'Head Office': ['Managing Director', 'Permanent Secretary', 'Director of Finance and Administration'],
     'Kirehe Branch': ['Branch Manager', 'Operations Officer', 'Customer Service'],
     'Gatsibo Branch': ['Branch Manager', 'Field Officer', 'Technician'],
-    'Mahama Water Treatment Plant': ['Plant Manager', 'Water Quality Analyst', 'Maintenance Lead']
+    'Mahama Water Treatment Plant': ['Plant Manager', 'Water Quality Analyst', 'Maintenance Lead'],
+    'WATERAID PROJECT': ['Site Engineer', 'Assistant Site Engineer', 'Pipe Welder Technician', 'Project Accountant', 'Driver Vehicle', 'Cashier & Store Keeper', 'Store keeper & Pointeur' ],
   };
 
   const normalizedBranch = branchName.trim().toLowerCase();
