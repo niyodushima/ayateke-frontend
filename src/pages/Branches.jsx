@@ -73,10 +73,10 @@ function AddForm({ branchName, onSubmit }) {
   const [gender, setGender] = useState('');
 
   const roleMap = {
-    'Head Office': [/* your roles */],
-    'Kirehe Branch': [/* your roles */],
-    'Gatsibo Branch': [/* your roles */],
-    'Mahama Water Treatment Plant': [/* your roles */]
+    'Head Office': ['Managing Director', 'Permanent Secretary', 'Director of Finance and Administration'],
+    'Kirehe Branch': ['Branch Manager', 'Operations Officer', 'Customer Service'],
+    'Gatsibo Branch': ['Branch Manager', 'Field Officer', 'Technician'],
+    'Mahama Water Treatment Plant': ['Plant Manager', 'Water Quality Analyst', 'Maintenance Lead']
   };
 
   const normalizedBranch = branchName.trim().toLowerCase();
@@ -200,7 +200,8 @@ export default function Branches() {
       (r.email || '').toLowerCase().includes(term) ||
       (r.tel || '').toLowerCase().includes(term) ||
       (r.address || '').toLowerCase().includes(term) ||
-      (r.gender || '').toLowerCase().includes(term    );
+            (r.gender || '').toLowerCase().includes(term)
+    );
   };
 
   const filteredBranches = branches.filter((b) =>
