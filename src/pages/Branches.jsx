@@ -47,6 +47,7 @@ function Table({ columns, rows, onDelete, onUpdate }) {
             <td style={td}>{r.email || '—'}</td>
             <td style={td}>{r.tel || '—'}</td>
             <td style={td}>{r.address || '—'}</td>
+            <td style={td}>{r.gender || '—'}</td>
             <td style={td}>
               <button onClick={() => onUpdate(r)} style={{ marginRight: 8 }}>Edit</button>
               <button
@@ -69,72 +70,13 @@ function AddForm({ branchName, onSubmit }) {
   const [email, setEmail] = useState('');
   const [tel, setTel] = useState('');
   const [address, setAddress] = useState('');
+  const [gender, setGender] = useState('');
 
   const roleMap = {
-    'Head Office': [
-      'Managing Director',
-      'Permanent Secretary',
-      'Director of Finance and Administration',
-      'Logistician and Store Keeper',
-      'Chief Accountant',
-      'Human Resource Officer',
-      'Internal Auditor',
-      'Tax Officer',
-      'IT Officer',
-      'Chief Driver',
-      'Accountant',
-      'Electromechanician',
-      'Assistant Chief Driver',
-      'Driver',
-      'Cleaner'
-    ],
-    'Kirehe Branch': [
-      'Branch Manager',
-      'Head of Technical Team',
-      'Chief Recovery Officer',
-      'Field Inspection Officer',
-      'Electromechanician',
-      'Accountant',
-      'Recovery Officer',
-      'Store Keeper and Cashier',
-      'Scheme Manager & Driver',
-      'Scheme Manager',
-      'Pump Operator',
-      'Plumber & Driver',
-      'Plumber',
-      'Plumber Assistant',
-      'Chlorine Mixer',
-      'Driver Vehicle',
-      'Driver Moto',
-      'Cleaner',
-      'Security Guard'
-    ],
-    'Gatsibo Branch': [
-      'Branch Manager',
-      'Head of Technical Team',
-      'Billing and Recovery Monitor',
-      'Scheme Manager & Driver',
-      'Scheme Manager',
-      'Plumber & Driver',
-      'Plumber',
-      'Pump Operator',
-      'Driver Vehicle',
-      'Driver Moto',
-      'Security Guard',
-      'Cleaner'
-    ],
-    'Mahama Water Treatment Plant': [
-      'Water Treatment Plant Manager',
-      'Water Supply Engineer',
-      'Accountant',
-      'Electromechanician',
-      'Water Quality Engineer',
-      'Electromechanic Engineer',
-      'Assistant Electromechanician',
-      'Pump Operator',
-      'Driver Vehicle',
-      'Laboratory Operator'
-    ],
+    'Head Office': [/* roles */],
+    'Kirehe Branch': [/* roles */],
+    'Gatsibo Branch': [/* roles */],
+    'Mahama Water Treatment Plant': [/* roles */],
     'WATERAID PROJECT': [
       'Site Engineer',
       'Assistant Site Engineer',
@@ -143,9 +85,9 @@ function AddForm({ branchName, onSubmit }) {
       'Driver Vehicle',
       'Cashier & Store Keeper',
       'Store Keeper & Pointeur'
-      ]
-   };
- 
+    ]
+  };
+
   const availableRoles = roleMap[branchName] || [];
 
   useEffect(() => {
@@ -155,22 +97,30 @@ function AddForm({ branchName, onSubmit }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!role) return;
-    onSubmit({ role, name, email, tel, address });
+    onSubmit({ role, name, email, tel, address, gender });
+    setRole('');
     setName('');
     setEmail('');
     setTel('');
     setAddress('');
+    setGender('');
   };
 
   return (
     <form onSubmit={handleSubmit} style={{ display: 'flex', flexWrap: 'wrap', gap: 8, margin: '10px 0' }}>
-      <select value={role} onChange={(e) => setRole(e.target.value)}>
+      <select value={role} onChange={(e) => setRole(e.target.value)} required>
         {availableRoles.map((r) => <option key={r} value={r}>{r}</option>)}
       </select>
       <input type="text" placeholder="Name" required value={name} onChange={(e) => setName(e.target.value)} style={{ flex: 1, padding: 6 }} />
       <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} style={{ flex: 1, padding: 6 }} />
       <input type="text" placeholder="Tel" value={tel} onChange={(e) => setTel(e.target.value)} style={{ flex: 1, padding: 6 }} />
       <input type="text" placeholder="Address" value={address} onChange={(e) => setAddress(e.target.value)} style={{ flex: 1, padding: 6 }} />
+      <select value={gender} onChange={(e) => setGender(e.target.value)} required style={{ flex: 1, padding: 6 }}>
+        <option value="">Select Gender</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Other">Other</option>
+      </select>
       <button type="submit">Add</button>
     </form>
   );
@@ -200,27 +150,22 @@ export default function Branches() {
   }, []);
 
   const addEntry = async (branchName, payload) => {
-  try {
-    const res = await axios.post(`${API_BASE}/api/branches/${encodeURIComponent(branchName)}/roles`, payload);
-    const newEntry = res.data?.data;
+    try {
+      const res = await axios.post(`${API_BASE}/api/branches/${encodeURIComponent(branchName)}/roles`, payload);
+      const newEntry = res.data?.data;
 
-    setBranches((prev) =>
-      prev.map((b) => {
-        if (b.branch !== branchName) return b;
-
-        const filtered = (b.roles || []).filter((r) => r.role !== newEntry.role);
-        return {
-          ...b,
-          roles: [newEntry, ...filtered]
-        };
-      })
-    );
-  } catch (err) {
-    console.error('Add entry failed:', err);
-    alert(err.response?.data?.error || 'Add failed');
-  }
-};
-
+      setBranches((prev) =>
+        prev.map((b) => {
+          if (b.branch !== branchName) return b;
+          const filtered = (b.roles || []).filter((r) => r.role !== newEntry.role && r.id !== newEntry.id);
+          return { ...b, roles: [newEntry, ...filtered] };
+        })
+      );
+    } catch (err) {
+      console.error('Add entry failed:', err);
+      alert(err.response?.data?.error || 'Add failed');
+    }
+  };
 
   const deleteEntry = async (branchName, id) => {
     if (!window.confirm('Delete this entry?')) return;
@@ -250,13 +195,14 @@ export default function Branches() {
 
   const filterRows = (rows) => {
     if (!searchTerm) return rows;
-        const term = searchTerm.toLowerCase();
+    const term = searchTerm.toLowerCase();
     return (rows || []).filter((r) =>
       r.role.toLowerCase().includes(term) ||
       (r.name || '').toLowerCase().includes(term) ||
       (r.email || '').toLowerCase().includes(term) ||
       (r.tel || '').toLowerCase().includes(term) ||
-      (r.address || '').toLowerCase().includes(term)
+      (r.address || '').toLowerCase().includes(term) ||
+      (r.gender || '').toLowerCase().includes(term)
     );
   };
 
@@ -296,7 +242,7 @@ export default function Branches() {
             </p>
             <AddForm branchName={b.branch} onSubmit={(payload) => addEntry(b.branch, payload)} />
             <Table
-              columns={['Role', 'Name', 'Email', 'Tel', 'Address']}
+              columns={['Role', 'Name', 'Email', 'Tel', 'Address', 'Gender']}
               rows={filterRows(b.roles)}
               onDelete={(id) => deleteEntry(b.branch, id)}
               onUpdate={(record) => updateEntry(b.branch, record)}
