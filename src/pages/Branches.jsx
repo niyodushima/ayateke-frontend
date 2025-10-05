@@ -76,16 +76,7 @@ function AddForm({ branchName, onSubmit }) {
     'Head Office': [/* your roles */],
     'Kirehe Branch': [/* your roles */],
     'Gatsibo Branch': [/* your roles */],
-    'Mahama Water Treatment Plant': [/* your roles */],
-    'WATERAID PROJECT': [
-      'Site Engineer',
-      'Assistant Site Engineer',
-      'Pipe Welder Technician',
-      'Project Accountant',
-      'Driver Vehicle',
-      'Cashier & Store Keeper',
-      'Store Keeper & Pointeur'
-    ]
+    'Mahama Water Treatment Plant': [/* your roles */]
   };
 
   const availableRoles = roleMap[branchName] || [];
@@ -152,13 +143,15 @@ export default function Branches() {
     try {
       const res = await axios.post(`${API_BASE}/api/branches/${encodeURIComponent(branchName)}/roles`, payload);
       const newEntry = res.data?.data;
-
       setBranches((prev) =>
-        prev.map((b) => {
-          if (b.branch !== branchName) return b;
-          const filtered = (b.roles || []).filter((r) => r.role !== newEntry.role && r.id !== newEntry.id);
-          return { ...b, roles: [newEntry, ...filtered] };
-        })
+        prev.map((b) =>
+          b.branch === branchName
+            ? {
+                ...b,
+                roles: [newEntry, ...(b.roles || []).filter((r) => r.role !== newEntry.role && r.id !== newEntry.id)]
+              }
+            : b
+        )
       );
     } catch (err) {
       console.error('Add entry failed:', err);
@@ -205,14 +198,14 @@ export default function Branches() {
     );
   };
 
-    const filteredBranches = branches.filter((b) =>
+  const filteredBranches = branches.filter((b) =>
     branchFilter === 'All' ? true : b.branch === branchFilter
   );
 
   if (loading) return <div style={{ padding: 20 }}>Loading branches...</div>;
 
   return (
-    <div style={{ padding: 20, maxWidth: 1200, margin: '0 auto' }}>
+       <div style={{ padding: 20, maxWidth: 1200, margin: '0 auto' }}>
       <h2 style={{ marginBottom: 16 }}>Ayateke Branches</h2>
 
       <div style={{ display: 'flex', gap: 10, marginBottom: 20 }}>
