@@ -79,7 +79,8 @@ function AddForm({ branchName, onSubmit }) {
     'Mahama Water Treatment Plant': [/* your roles */]
   };
 
-  const availableRoles = roleMap[branchName] || [];
+  const normalizedBranch = branchName.trim();
+  const availableRoles = roleMap[normalizedBranch] || ['Custom Role'];
 
   useEffect(() => {
     if (availableRoles.length > 0) {
@@ -100,17 +101,8 @@ function AddForm({ branchName, onSubmit }) {
 
   return (
     <form onSubmit={handleSubmit} style={{ display: 'flex', flexWrap: 'wrap', gap: 8, margin: '10px 0' }}>
-      <select
-        value={role}
-        onChange={(e) => setRole(e.target.value)}
-        required
-        disabled={availableRoles.length === 0}
-      >
-        {availableRoles.length === 0 ? (
-          <option value="">No roles available</option>
-        ) : (
-          availableRoles.map((r) => <option key={r} value={r}>{r}</option>)
-        )}
+      <select value={role} onChange={(e) => setRole(e.target.value)} required>
+        {availableRoles.map((r) => <option key={r} value={r}>{r}</option>)}
       </select>
       <input type="text" placeholder="Name" required value={name} onChange={(e) => setName(e.target.value)} style={{ flex: 1, padding: 6 }} />
       <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} style={{ flex: 1, padding: 6 }} />
@@ -209,7 +201,7 @@ export default function Branches() {
     );
   };
 
-  const filteredBranches = branches.filter((b) =>
+    const filteredBranches = branches.filter((b) =>
     branchFilter === 'All' ? true : b.branch === branchFilter
   );
 
