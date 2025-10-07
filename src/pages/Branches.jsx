@@ -90,7 +90,7 @@ function AddForm({ branchName, onSubmit }) {
   const [gender, setGender] = useState('');
 
   const roleMap = {
-    'Head Office': ['Managing Director', 'Permanent Secretary', 'Director of Finance and Administration'],
+    'Head Office': ['Managing Director', 'Permanent Secretary', 'Director of Finance and Administration', 'Logistician and Store Keeper', 'Chief Accountant', 'Human Resource Officer', 'Internal Auditor', 'Tax Officer', 'IT Officer', 'Chief Driver', 'Chief Driver', 'Accountant', 'Electromechanician', 'Assistant Chief Driver', 'Driver', 'Cleaner' ],
     'Kirehe Branch': ['Branch Manager', 'Head of Technical Team', 'Chief Recovery Officer', 'Field Inspection Officer', 'Electromechanician', 'Accountant', 'Recovery Officer', 'Store Keeper & Cashier', 'Scheme Manager & Driver', 'Scheme Manager', 'Pump Operator', 'Plumber & Driver', 'Plumber', 'Plumber Assistant', 'Chroline Mixer', 'Driver Vehicle', 'Driver Moto', 'Cleaner', 'Security Guard' ],
     'Gatsibo Branch': ['Branch Manager', 'Head of Technical Team', 'Billing and Recovery Monitor', 'Scheme Manager & Driver', 'Scheme Manager', 'Plumber & Driver', 'Plumber', 'Pump Operater', 'Driver Vehicle', 'Driver Moto', 'Security Guard', 'Cleaner' ],
     'Mahama Water Treatment Plant': ['Water Treatment Plant Manager', 'Water Supply Engineer', 'Accountant', 'Electromechanician', 'Water Quality Engineer', 'Electro Mechanical Engineer', 'Assistant Electromechanician', 'Pump Operator', 'Driver Vehicle', 'Laboratory Operator', 'Plumber', 'Pump Operator' ],
