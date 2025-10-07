@@ -50,7 +50,7 @@ function Table({ columns, rows, onDelete, onUpdate, onAttachFile, availableRoles
               <td style={td}>{r.address || '—'}</td>
               <td style={td}>{r.gender || '—'}</td>
               <td style={td}>
-                <button onClick={() => onUpdate(r, availableRoles)} style={{ marginRight: 8 }}>Edit</button>
+                <button onClick={() => onUpdate(r)} style={{ marginRight: 8 }}>Edit</button>
                 <button
                   onClick={() => onDelete(r.id)}
                   style={{ color: 'white', background: '#e53e3e', border: 'none', padding: '6px 10px', borderRadius: 4 }}
@@ -93,18 +93,15 @@ function AddForm({ branchName, onSubmit }) {
   const [gender, setGender] = useState('');
 
   const roleMap = {
-    'Head Office': ['Managing Director', 'Permanent Secretary', 'Director of Finance and Administration', 'Logistician and Store Keeper', 'Chief Accountant', 'Human Resource Officer', 'Internal Auditor', 'Tax Officer', 'IT Officer', 'Chief Driver', 'Accountant', 'Electromechanician', 'Assistant Chief Driver', 'Driver', 'Cleaner'],
-    'Kirehe Branch': ['Branch Manager', 'Head of Technical Team', 'Chief Recovery Officer', 'Field Inspection Officer', 'Electromechanician', 'Accountant', 'Recovery Officer', 'Store Keeper & Cashier', 'Scheme Manager & Driver', 'Scheme Manager', 'Pump Operator', 'Plumber & Driver', 'Plumber', 'Plumber Assistant', 'Chroline Mixer', 'Driver Vehicle', 'Driver Moto', 'Cleaner', 'Security Guard'],
-    'Gatsibo Branch': ['Branch Manager', 'Head of Technical Team', 'Billing and Recovery Monitor', 'Scheme Manager & Driver', 'Scheme Manager', 'Plumber & Driver', 'Plumber', 'Pump Operater', 'Driver Vehicle', 'Driver Moto', 'Security Guard', 'Cleaner'],
-    'Mahama Water Treatment Plant': ['Water Treatment Plant Manager', 'Water Supply Engineer', 'Accountant', 'Electromechanician', 'Water Quality Engineer', 'Electro Mechanical Engineer', 'Assistant Electromechanician', 'Pump Operator', 'Driver Vehicle', 'Laboratory Operator', 'Plumber', 'Pump Operator'],
-    'WATERAID PROJECT': ['Site Engineer', 'Assistant Site Engineer', 'Pipe Welder Technician', 'Project Accountant', 'Driver Vehicle', 'Cashier & Store Keeper', 'Store keeper & Pointeur']
+    'head office': ['Managing Director', 'Permanent Secretary', 'Director of Finance and Administration', 'Logistician and Store Keeper', 'Chief Accountant', 'Human Resource Officer', 'Internal Auditor', 'Tax Officer', 'IT Officer', 'Chief Driver', 'Accountant', 'Electromechanician', 'Assistant Chief Driver', 'Driver', 'Cleaner'],
+    'kirehe branch': ['Branch Manager', 'Head of Technical Team', 'Chief Recovery Officer', 'Field Inspection Officer', 'Electromechanician', 'Accountant', 'Recovery Officer', 'Store Keeper & Cashier', 'Scheme Manager & Driver', 'Scheme Manager', 'Pump Operator', 'Plumber & Driver', 'Plumber', 'Plumber Assistant', 'Chroline Mixer', 'Driver Vehicle', 'Driver Moto', 'Cleaner', 'Security Guard'],
+    'gatsibo branch': ['Branch Manager', 'Head of Technical Team', 'Billing and Recovery Monitor', 'Scheme Manager & Driver', 'Scheme Manager', 'Plumber & Driver', 'Plumber', 'Pump Operater', 'Driver Vehicle', 'Driver Moto', 'Security Guard', 'Cleaner'],
+    'mahama water treatment plant': ['Water Treatment Plant Manager', 'Water Supply Engineer', 'Accountant', 'Electromechanician', 'Water Quality Engineer', 'Electro Mechanical Engineer', 'Assistant Electromechanician', 'Pump Operator', 'Driver Vehicle', 'Laboratory Operator', 'Plumber', 'Pump Operator'],
+    'wateraid project': ['Site Engineer', 'Assistant Site Engineer', 'Pipe Welder Technician', 'Project Accountant', 'Driver Vehicle', 'Cashier & Store Keeper', 'Store keeper & Pointeur']
   };
 
-  const normalizedBranch = branchName.trim().toLowerCase();
-  const roleMapNormalized = Object.fromEntries(
-    Object.entries(roleMap).map(([key, val]) => [key.trim().toLowerCase(), val])
-  );
-  const availableRoles = roleMapNormalized[normalizedBranch] || ['Custom Role'];
+  const normalizedBranch = branchName.replace(/\s+/g, ' ').trim().toLowerCase();
+  const availableRoles = roleMap[normalizedBranch] || ['Custom Role'];
 
   useEffect(() => {
     if (availableRoles.length > 0) {
@@ -197,15 +194,28 @@ export default function Branches() {
     }
   };
 
-  const updateEntry = async (branchName, record, availableRoles) => {
+  const updateEntry = async (record) => {
     const newName = window.prompt('Update name:', record.name || '');
     if (newName === null) return;
+
+    const normalizedBranch = record.branch.replace(/\s+/g, ' ').trim().toLowerCase();
+    const roleMapNormalized = {
+      'head office': [...],
+      'kirehe branch': [...],
+      'gatsibo branch': [...],
+      'mahama water treatment plant': [...],
+      'wateraid project': [...]
+    };
+    const availableRoles = [...new Set([
+      ...(roleMapNormalized[normalizedBranch] || []),
+      ...branches.find(b => b.branch === record.branch)?.roles.map(r => r.role) || []
+    ])];
 
     const newRole = window.prompt(`Update role:\n${availableRoles.join(', ')}`, record.role || '');
     if (newRole === null) return;
 
     try {
-      await axios.put(`${API_BASE}/api/branches/${encodeURIComponent(branchName)}/roles/${record.id}`, {
+      await axios.put(`${API_BASE}/api/branches/${encodeURIComponent(record.branch)}/roles/${record.id}`, {
         name: newName,
         role: newRole
       });
@@ -275,15 +285,18 @@ export default function Branches() {
       </div>
 
       {filteredBranches.map((b) => {
-        const normalizedBranch = b.branch.trim().toLowerCase();
+        const normalizedBranch = b.branch.replace(/\s+/g, ' ').trim().toLowerCase();
         const roleMapNormalized = {
-          'head office': ['Managing Director', 'Permanent Secretary', 'Director of Finance and Administration', 'Logistician and Store Keeper', 'Chief Accountant', 'Human Resource Officer', 'Internal Auditor', 'Tax Officer', 'IT Officer', 'Chief Driver', 'Accountant', 'Electromechanician', 'Assistant Chief Driver', 'Driver', 'Cleaner'],
-          'kirehe branch': ['Branch Manager', 'Head of Technical Team', 'Chief Recovery Officer', 'Field Inspection Officer', 'Electromechanician', 'Accountant', 'Recovery Officer', 'Store Keeper & Cashier', 'Scheme Manager & Driver', 'Scheme Manager', 'Pump Operator', 'Plumber & Driver', 'Plumber', 'Plumber Assistant', 'Chroline Mixer', 'Driver Vehicle', 'Driver Moto', 'Cleaner', 'Security Guard'],
-          'gatsibo branch': ['Branch Manager', 'Head of Technical Team', 'Billing and Recovery Monitor', 'Scheme Manager & Driver', 'Scheme Manager', 'Plumber & Driver', 'Plumber', 'Pump Operater', 'Driver Vehicle', 'Driver Moto', 'Security Guard', 'Cleaner'],
-          'mahama water treatment plant': ['Water Treatment Plant Manager', 'Water Supply Engineer', 'Accountant', 'Electromechanician', 'Water Quality Engineer', 'Electro Mechanical Engineer', 'Assistant Electromechanician', 'Pump Operator', 'Driver Vehicle', 'Laboratory Operator', 'Plumber', 'Pump Operator'],
-          'wateraid project': ['Site Engineer', 'Assistant Site Engineer', 'Pipe Welder Technician', 'Project Accountant', 'Driver Vehicle', 'Cashier & Store Keeper', 'Store keeper & Pointeur']
+          'head office': [...],
+          'kirehe branch': [...],
+          'gatsibo branch': [...],
+          'mahama water treatment plant': [...],
+          'wateraid project': [...]
         };
-        const availableRoles = roleMapNormalized[normalizedBranch] || ['Custom Role'];
+        const availableRoles = [...new Set([
+          ...(roleMapNormalized[normalizedBranch] || []),
+          ...b.roles.map(r => r.role)
+        ])];
 
         const unassignedCount = (b.roles || []).filter((r) => !r.name || r.name.trim() === '').length;
 
@@ -297,7 +310,7 @@ export default function Branches() {
               columns={['Role', 'Name', 'Email', 'Tel', 'Address', 'Gender']}
               rows={filterRows(b.roles.map((r) => ({ ...r, branch: b.branch })))}
               onDelete={(id) => deleteEntry(b.branch, id)}
-              onUpdate={(record) => updateEntry(b.branch, record, availableRoles)}
+              onUpdate={(record) => updateEntry(record)}
               onAttachFile={onAttachFile}
               availableRoles={availableRoles}
             />
