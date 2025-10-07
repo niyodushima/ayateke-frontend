@@ -23,7 +23,7 @@ function Section({ title, children }) {
   );
 }
 
-function Table({ columns, rows, onDelete, onUpdate, onUpload }) {
+function Table({ columns, rows, onDelete, onUpdate, onAttachFile, availableRoles }) {
   return (
     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
       <thead>
@@ -50,14 +50,17 @@ function Table({ columns, rows, onDelete, onUpdate, onUpload }) {
               <td style={td}>{r.address || '—'}</td>
               <td style={td}>{r.gender || '—'}</td>
               <td style={td}>
-                <button onClick={() => onUpdate(r)} style={{ marginRight: 8 }}>Edit</button>
+                <button onClick={() => onUpdate(r, availableRoles)} style={{ marginRight: 8 }}>Edit</button>
                 <button
                   onClick={() => onDelete(r.id)}
                   style={{ color: 'white', background: '#e53e3e', border: 'none', padding: '6px 10px', borderRadius: 4 }}
                 >
                   Delete
                 </button>
-                <button onClick={() => onUpload(r)} style={{ marginLeft: 8 }}>Upload Doc</button>
+                <label style={{ marginLeft: 8 }}>
+                  <span style={{ cursor: 'pointer', color: '#3182ce' }}>Attach File</span>
+                  <input type="file" hidden onChange={(e) => onAttachFile(e, r)} />
+                </label>
               </td>
             </tr>
             {r.documents?.length > 0 && (
@@ -90,11 +93,11 @@ function AddForm({ branchName, onSubmit }) {
   const [gender, setGender] = useState('');
 
   const roleMap = {
-    'Head Office': ['Managing Director', 'Permanent Secretary', 'Director of Finance and Administration', 'Logistician and Store Keeper', 'Chief Accountant', 'Human Resource Officer', 'Internal Auditor', 'Tax Officer', 'IT Officer', 'Chief Driver', 'Chief Driver', 'Accountant', 'Electromechanician', 'Assistant Chief Driver', 'Driver', 'Cleaner' ],
-    'Kirehe Branch': ['Branch Manager', 'Head of Technical Team', 'Chief Recovery Officer', 'Field Inspection Officer', 'Electromechanician', 'Accountant', 'Recovery Officer', 'Store Keeper & Cashier', 'Scheme Manager & Driver', 'Scheme Manager', 'Pump Operator', 'Plumber & Driver', 'Plumber', 'Plumber Assistant', 'Chroline Mixer', 'Driver Vehicle', 'Driver Moto', 'Cleaner', 'Security Guard' ],
-    'Gatsibo Branch': ['Branch Manager', 'Head of Technical Team', 'Billing and Recovery Monitor', 'Scheme Manager & Driver', 'Scheme Manager', 'Plumber & Driver', 'Plumber', 'Pump Operater', 'Driver Vehicle', 'Driver Moto', 'Security Guard', 'Cleaner' ],
-    'Mahama Water Treatment Plant': ['Water Treatment Plant Manager', 'Water Supply Engineer', 'Accountant', 'Electromechanician', 'Water Quality Engineer', 'Electro Mechanical Engineer', 'Assistant Electromechanician', 'Pump Operator', 'Driver Vehicle', 'Laboratory Operator', 'Plumber', 'Pump Operator' ],
-    'WATERAID PROJECT': ['Site Engineer', 'Assistant Site Engineer', 'Pipe Welder Technician', 'Project Accountant', 'Driver Vehicle', 'Cashier & Store Keeper', 'Store keeper & Pointeur' ],
+    'Head Office': ['Managing Director', 'Permanent Secretary', 'Director of Finance and Administration', 'Logistician and Store Keeper', 'Chief Accountant', 'Human Resource Officer', 'Internal Auditor', 'Tax Officer', 'IT Officer', 'Chief Driver', 'Accountant', 'Electromechanician', 'Assistant Chief Driver', 'Driver', 'Cleaner'],
+    'Kirehe Branch': ['Branch Manager', 'Head of Technical Team', 'Chief Recovery Officer', 'Field Inspection Officer', 'Electromechanician', 'Accountant', 'Recovery Officer', 'Store Keeper & Cashier', 'Scheme Manager & Driver', 'Scheme Manager', 'Pump Operator', 'Plumber & Driver', 'Plumber', 'Plumber Assistant', 'Chroline Mixer', 'Driver Vehicle', 'Driver Moto', 'Cleaner', 'Security Guard'],
+    'Gatsibo Branch': ['Branch Manager', 'Head of Technical Team', 'Billing and Recovery Monitor', 'Scheme Manager & Driver', 'Scheme Manager', 'Plumber & Driver', 'Plumber', 'Pump Operater', 'Driver Vehicle', 'Driver Moto', 'Security Guard', 'Cleaner'],
+    'Mahama Water Treatment Plant': ['Water Treatment Plant Manager', 'Water Supply Engineer', 'Accountant', 'Electromechanician', 'Water Quality Engineer', 'Electro Mechanical Engineer', 'Assistant Electromechanician', 'Pump Operator', 'Driver Vehicle', 'Laboratory Operator', 'Plumber', 'Pump Operator'],
+    'WATERAID PROJECT': ['Site Engineer', 'Assistant Site Engineer', 'Pipe Welder Technician', 'Project Accountant', 'Driver Vehicle', 'Cashier & Store Keeper', 'Store keeper & Pointeur']
   };
 
   const normalizedBranch = branchName.trim().toLowerCase();
@@ -194,12 +197,17 @@ export default function Branches() {
     }
   };
 
-  const updateEntry = async (branchName, record) => {
+  const updateEntry = async (branchName, record, availableRoles) => {
     const newName = window.prompt('Update name:', record.name || '');
     if (newName === null) return;
+
+    const newRole = window.prompt(`Update role:\n${availableRoles.join(', ')}`, record.role || '');
+    if (newRole === null) return;
+
     try {
       await axios.put(`${API_BASE}/api/branches/${encodeURIComponent(branchName)}/roles/${record.id}`, {
-        name: newName,        role: record.role
+        name: newName,
+        role: newRole
       });
       await load();
     } catch (err) {
@@ -208,22 +216,22 @@ export default function Branches() {
     }
   };
 
-  const uploadDocument = async (record) => {
+  const onAttachFile = async (e, record) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
     const name = window.prompt('Document name (e.g. CV, ID, Contract):');
     if (!name) return;
-
-    const type = window.prompt('Document type (PDF, DOCX, JPG):');
-    if (!type) return;
 
     try {
       await axios.post(`${API_BASE}/api/branches/${encodeURIComponent(record.branch)}/roles/${record.id}/documents`, {
         name,
-        type
+        type: file.type
       });
       await load();
     } catch (err) {
-      console.error('Upload failed:', err);
-      alert(err.response?.data?.error || 'Upload failed');
+      console.error('Attach failed:', err);
+      alert(err.response?.data?.error || 'Attach failed');
     }
   };
 
@@ -267,6 +275,16 @@ export default function Branches() {
       </div>
 
       {filteredBranches.map((b) => {
+        const normalizedBranch = b.branch.trim().toLowerCase();
+        const roleMapNormalized = {
+          'head office': ['Managing Director', 'Permanent Secretary', 'Director of Finance and Administration', 'Logistician and Store Keeper', 'Chief Accountant', 'Human Resource Officer', 'Internal Auditor', 'Tax Officer', 'IT Officer', 'Chief Driver', 'Accountant', 'Electromechanician', 'Assistant Chief Driver', 'Driver', 'Cleaner'],
+          'kirehe branch': ['Branch Manager', 'Head of Technical Team', 'Chief Recovery Officer', 'Field Inspection Officer', 'Electromechanician', 'Accountant', 'Recovery Officer', 'Store Keeper & Cashier', 'Scheme Manager & Driver', 'Scheme Manager', 'Pump Operator', 'Plumber & Driver', 'Plumber', 'Plumber Assistant', 'Chroline Mixer', 'Driver Vehicle', 'Driver Moto', 'Cleaner', 'Security Guard'],
+          'gatsibo branch': ['Branch Manager', 'Head of Technical Team', 'Billing and Recovery Monitor', 'Scheme Manager & Driver', 'Scheme Manager', 'Plumber & Driver', 'Plumber', 'Pump Operater', 'Driver Vehicle', 'Driver Moto', 'Security Guard', 'Cleaner'],
+          'mahama water treatment plant': ['Water Treatment Plant Manager', 'Water Supply Engineer', 'Accountant', 'Electromechanician', 'Water Quality Engineer', 'Electro Mechanical Engineer', 'Assistant Electromechanician', 'Pump Operator', 'Driver Vehicle', 'Laboratory Operator', 'Plumber', 'Pump Operator'],
+          'wateraid project': ['Site Engineer', 'Assistant Site Engineer', 'Pipe Welder Technician', 'Project Accountant', 'Driver Vehicle', 'Cashier & Store Keeper', 'Store keeper & Pointeur']
+        };
+        const availableRoles = roleMapNormalized[normalizedBranch] || ['Custom Role'];
+
         const unassignedCount = (b.roles || []).filter((r) => !r.name || r.name.trim() === '').length;
 
         return (
@@ -279,8 +297,9 @@ export default function Branches() {
               columns={['Role', 'Name', 'Email', 'Tel', 'Address', 'Gender']}
               rows={filterRows(b.roles.map((r) => ({ ...r, branch: b.branch })))}
               onDelete={(id) => deleteEntry(b.branch, id)}
-              onUpdate={(record) => updateEntry(b.branch, record)}
-              onUpload={(record) => uploadDocument(record)}
+              onUpdate={(record) => updateEntry(b.branch, record, availableRoles)}
+              onAttachFile={onAttachFile}
+              availableRoles={availableRoles}
             />
           </Section>
         );
@@ -288,4 +307,3 @@ export default function Branches() {
     </div>
   );
 }
-
