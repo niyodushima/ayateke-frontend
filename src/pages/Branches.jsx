@@ -104,10 +104,11 @@ function AddForm({ branchName, onSubmit }) {
   const availableRoles = roleMap[normalizedBranch] || ['Custom Role'];
 
   useEffect(() => {
-    if (availableRoles.length > 0) {
-      setRole(availableRoles[0]);
-    }
-  }, [availableRoles]);
+  if (!role && availableRoles.length > 0) {
+    setRole(availableRoles[0]);
+  }
+}, [availableRoles, role]);
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
