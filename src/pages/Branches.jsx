@@ -91,7 +91,7 @@ function AddForm({ branchName, onSubmit }) {
 
   const roleMap = {
     'Head Office': ['Managing Director', 'Permanent Secretary', 'Director of Finance and Administration'],
-    'Kirehe Branch': ['Branch Manager', 'Operations Officer', 'Customer Service'],
+    'Kirehe Branch': ['Branch Manager', 'Head of Technical Team', 'Chief Recovery Officer', 'Field Inspection Officer', 'Electromechanician', 'Accountant', 'Recovery Officer', 'Store Keeper & Cashier', 'Scheme Manager & Driver', 'Scheme Manager', 'Pump Operator', 'Plumber & Driver', 'Plumber', 'Plumber Assistant', 'Chroline Mixer', 'Driver Vehicle', 'Driver Moto', 'Cleaner', 'Security Guard' ],
     'Gatsibo Branch': ['Branch Manager', 'Head of Technical Team', 'Billing and Recovery Monitor', 'Scheme Manager & Driver', 'Scheme Manager', 'Plumber & Driver', 'Plumber', 'Pump Operater', 'Driver Vehicle', 'Driver Moto', 'Security Guard', 'Cleaner' ],
     'Mahama Water Treatment Plant': ['Water Treatment Plant Manager', 'Water Supply Engineer', 'Accountant', 'Electromechanician', 'Water Quality Engineer', 'Electro Mechanical Engineer', 'Assistant Electromechanician', 'Pump Operator', 'Driver Vehicle', 'Laboratory Operator', 'Plumber', 'Pump Operator' ],
     'WATERAID PROJECT': ['Site Engineer', 'Assistant Site Engineer', 'Pipe Welder Technician', 'Project Accountant', 'Driver Vehicle', 'Cashier & Store Keeper', 'Store keeper & Pointeur' ],
