@@ -29,27 +29,27 @@ function Table({ columns, rows, onDelete, onUpdate, onAttachFile, availableRoles
       <thead>
         <tr style={{ background: '#edf2f7' }}>
           {columns.map((c) => (
-            <th key={c} style={th}>{c}</th>
+            <th key={c} style={{ textAlign: 'left', padding: 10, borderBottom: '2px solid #cbd5e0' }}>{c}</th>
           ))}
-          <th style={th}>Actions</th>
+          <th style={{ textAlign: 'left', padding: 10, borderBottom: '2px solid #cbd5e0' }}>Actions</th>
         </tr>
       </thead>
       <tbody>
         {(!Array.isArray(rows) || rows.length === 0) && (
           <tr>
-            <td colSpan={columns.length + 1} style={td}>No records</td>
+            <td colSpan={columns.length + 1} style={{ padding: 10 }}>No records</td>
           </tr>
         )}
         {(rows || []).map((r) => (
           <React.Fragment key={r.id}>
             <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
-              <td style={td}>{r.role}</td>
-              <td style={td}>{r.name || '—'}</td>
-              <td style={td}>{r.email || '—'}</td>
-              <td style={td}>{r.tel || '—'}</td>
-              <td style={td}>{r.address || '—'}</td>
-              <td style={td}>{r.gender || '—'}</td>
-              <td style={td}>
+              <td style={{ padding: 10 }}>{r.role}</td>
+              <td style={{ padding: 10 }}>{r.name || '—'}</td>
+              <td style={{ padding: 10 }}>{r.email || '—'}</td>
+              <td style={{ padding: 10 }}>{r.tel || '—'}</td>
+              <td style={{ padding: 10 }}>{r.address || '—'}</td>
+              <td style={{ padding: 10 }}>{r.gender || '—'}</td>
+              <td style={{ padding: 10 }}>
                 <button onClick={() => onUpdate(r)} style={{ marginRight: 8 }}>Edit</button>
                 <button
                   onClick={() => onDelete(r.id)}
@@ -63,17 +63,21 @@ function Table({ columns, rows, onDelete, onUpdate, onAttachFile, availableRoles
                 </label>
               </td>
             </tr>
+
+            {/* 🔽 Attached Documents Section */}
             {r.documents?.length > 0 && (
               <tr>
-                <td colSpan={columns.length + 1} style={{ background: '#f9fafb', padding: '6px 10px' }}>
-                  <strong>Documents:</strong>
-                  <ul style={{ margin: '6px 0' }}>
-                    {r.documents.map((doc) => (
-                      <li key={doc.id}>
-                        {doc.name} ({doc.type}) — {new Date(doc.uploadedAt).toLocaleDateString()}
-                      </li>
-                    ))}
-                  </ul>
+                <td colSpan={columns.length + 1} style={{ background: '#f9fafb', padding: '10px 14px' }}>
+                  <div style={{ background: '#f1f5f9', padding: '8px 12px', borderRadius: 6 }}>
+                    <strong>📎 Attached Documents:</strong>
+                    <ul style={{ marginTop: 6 }}>
+                      {r.documents.map((doc) => (
+                        <li key={doc.id}>
+                          {doc.name} ({doc.type}) — {new Date(doc.uploadedAt).toLocaleDateString()}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </td>
               </tr>
             )}
@@ -83,6 +87,7 @@ function Table({ columns, rows, onDelete, onUpdate, onAttachFile, availableRoles
     </table>
   );
 }
+
 
 function AddForm({ branchName, onSubmit }) {
   const [role, setRole] = useState('');
