@@ -318,7 +318,7 @@ export default function Branches() {
               rows={filterRows(b.roles.map((r) => ({ ...r, branch: b.branch })))}
               onDelete={(id) => deleteEntry(b.branch, id)}
               onUpdate={(record) => updateEntry(record)}
-              onAttachFile={onAttachFile}
+              onAttachFile={onAttachFile} 
               availableRoles={availableRoles}
             />
           </Section>
