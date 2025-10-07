@@ -93,7 +93,7 @@ function AddForm({ branchName, onSubmit }) {
     'Head Office': ['Managing Director', 'Permanent Secretary', 'Director of Finance and Administration'],
     'Kirehe Branch': ['Branch Manager', 'Operations Officer', 'Customer Service'],
     'Gatsibo Branch': ['Branch Manager', 'Field Officer', 'Technician'],
-    'Mahama Water Treatment Plant': ['Plant Manager', 'Water Quality Analyst', 'Maintenance Lead'],
+    'Mahama Water Treatment Plant': ['Water Treatment Plant Manager', 'Water Supply Engineer', 'Accountant', 'Electromechanician', 'Water Quality Engineer', 'Electro Mechanical Engineer', 'Assistant Electromechanician', 'Pump Operator', 'Driver Vehicle', 'Laboratory Operator', 'Plumber', 'Pump Operator' ],
     'WATERAID PROJECT': ['Site Engineer', 'Assistant Site Engineer', 'Pipe Welder Technician', 'Project Accountant', 'Driver Vehicle', 'Cashier & Store Keeper', 'Store keeper & Pointeur' ],
   };
 
