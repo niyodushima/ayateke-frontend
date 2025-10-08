@@ -31,24 +31,24 @@ const AdminTrainingDashboard = () => {
       employee: 'nadine@ayateke.com',
       department: 'Engineering',
       trainings: [
-        { title: 'Workplace Safety', completed: true },
-        { title: 'Data Privacy', completed: false },
+        { title: 'Workplace Safety', completed: true, date: '2025-09-01' },
+        { title: 'Data Privacy', completed: false, date: '2025-09-15' },
       ],
     },
     {
       employee: 'alice@ayateke.com',
       department: 'Finance',
       trainings: [
-        { title: 'Workplace Safety', completed: true },
-        { title: 'Customer Service', completed: true },
+        { title: 'Workplace Safety', completed: true, date: '2025-09-10' },
+        { title: 'Customer Service', completed: true, date: '2025-09-20' },
       ],
     },
     {
       employee: 'john@ayateke.com',
       department: 'Operations',
       trainings: [
-        { title: 'Workplace Safety', completed: false },
-        { title: 'Data Privacy', completed: false },
+        { title: 'Workplace Safety', completed: false, date: '2025-09-05' },
+        { title: 'Data Privacy', completed: false, date: '2025-09-18' },
       ],
     },
   ]);
@@ -86,11 +86,12 @@ const AdminTrainingDashboard = () => {
 
   const handleAddTraining = () => {
     if (!selectedEmp || !newTraining.trim()) return;
+    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
     const updated = trainingData.map((user) => {
       if (user.employee === selectedEmp) {
         return {
           ...user,
-          trainings: [...user.trainings, { title: newTraining.trim(), completed: false }],
+          trainings: [...user.trainings, { title: newTraining.trim(), completed: false, date: today }],
         };
       }
       return user;
@@ -144,6 +145,7 @@ const AdminTrainingDashboard = () => {
             <Th>Employee</Th>
             <Th>Department</Th>
             <Th>Training Module</Th>
+            <Th>Date Assigned</Th>
             <Th>Status</Th>
             <Th>Actions</Th>
           </Tr>
@@ -155,6 +157,7 @@ const AdminTrainingDashboard = () => {
                 <Td>{user.employee}</Td>
                 <Td>{user.department}</Td>
                 <Td>{module.title}</Td>
+                <Td>{module.date || '—'}</Td>
                 <Td>
                   <Badge
                     colorScheme={module.completed ? 'green' : 'red'}
