@@ -13,7 +13,7 @@ import Attendance from './pages/Attendance';
 import StaffDashboard from './pages/StaffDashboard';
 import StaffTraining from './components/StaffTraining'; // ✅ moved to pages for consistency
    // ✅ moved to pages for consistency
-import Branches from './pages/Branches';
+import Employees from './pages/Employees';
 import LeaveRequest from './pages/LeaveRequest';        // ✅ staff leave request
 import LeaveDashboard from './pages/LeaveDashboard';    // ✅ admin leave dashboard
 
