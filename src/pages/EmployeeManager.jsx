@@ -11,7 +11,10 @@ const API = 'https://ayateke-backend.onrender.com/api/employees';
 const EmployeeManager = () => {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [newEntry, setNewEntry] = useState({ name: '', role: '', email: '', tel: '', address: '' });
+  const [selectedId, setSelectedId] = useState(null);
+  const [newEntry, setNewEntry] = useState({
+    name: '', role: '', email: '', tel: '', address: '', education: ''
+  });
 
   const fetchEmployees = async () => {
     try {
@@ -41,10 +44,31 @@ const EmployeeManager = () => {
     if (!newEntry.name || !newEntry.role) return;
     try {
       await axios.post(API, newEntry);
-      setNewEntry({ name: '', role: '', email: '', tel: '', address: '' });
+      setNewEntry({
+        name: '', role: '', email: '', tel: '', address: '', education: ''
+      });
       fetchEmployees();
     } catch (err) {
       console.error('Error adding employee:', err.message);
+    }
+  };
+
+  const handleDocumentUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file || !selectedId) return;
+
+    const docMeta = {
+      name: file.name,
+      type: file.type
+    };
+
+    try {
+      await axios.post(`${API}/${selectedId}/documents`, docMeta);
+      fetchEmployees();
+      alert('Document attached successfully');
+    } catch (err) {
+      console.error('Upload error:', err.message);
+      alert('Failed to attach document');
     }
   };
 
@@ -63,6 +87,7 @@ const EmployeeManager = () => {
               <Th>Email</Th>
               <Th>Tel</Th>
               <Th>Address</Th>
+              <Th>Education</Th>
             </Tr>
           </Thead>
           <Tbody>
@@ -104,23 +129,19 @@ const EmployeeManager = () => {
                   />
                 </Td>
                 <Td>
-                  <FormControl mb={2}>
-  <FormLabel fontSize="sm">Education Background</FormLabel>
-  <Select
-    size="sm"
-    value={newEntry.education}
-    onChange={(e) => setNewEntry({ ...newEntry, education: e.target.value })}
-  >
-    <option value="">Select</option>
-    <option value="PhD">PhD</option>
-    <option value="Masters">Masters</option>
-    <option value="Bachelors">Bachelors</option>
-    <option value="A1">A1</option>
-    <option value="Secondary">Secondary</option>
-    <option value="Primary">Primary</option>
-  </Select>
-</FormControl>
-
+                  <Select
+                    size="sm"
+                    value={emp.education || ''}
+                    onChange={(e) => handleUpdate(emp.id, 'education', e.target.value)}
+                  >
+                    <option value="">Select</option>
+                    <option value="PhD">PhD</option>
+                    <option value="Masters">Masters</option>
+                    <option value="Bachelors">Bachelors</option>
+                    <option value="A1">A1</option>
+                    <option value="Secondary">Secondary</option>
+                    <option value="Primary">Primary</option>
+                  </Select>
                 </Td>
               </Tr>
             ))}
@@ -165,10 +186,49 @@ const EmployeeManager = () => {
           onChange={(e) => setNewEntry({ ...newEntry, address: e.target.value })}
           mb={2}
         />
+        <FormControl mb={2}>
+          <FormLabel fontSize="sm">Education Background</FormLabel>
+          <Select
+            size="sm"
+            value={newEntry.education}
+            onChange={(e) => setNewEntry({ ...newEntry, education: e.target.value })}
+          >
+            <option value="">Select</option>
+            <option value="PhD">PhD</option>
+            <option value="Masters">Masters</option>
+            <option value="Bachelors">Bachelors</option>
+            <option value="A1">A1</option>
+            <option value="Secondary">Secondary</option>
+            <option value="Primary">Primary</option>
+          </Select>
+        </FormControl>
         <Button size="sm" colorScheme="teal" onClick={handleAdd}>
           + Add Employee
         </Button>
       </Box>
+
+      <Heading size="sm" mb={2}>Attach Document to Employee</Heading>
+      <FormControl mb={4}>
+        <FormLabel fontSize="sm">Select Employee</FormLabel>
+        <Select
+          size="sm"
+          placeholder="Choose employee"
+          value={selectedId || ''}
+          onChange={(e) => setSelectedId(e.target.value)}
+        >
+          {employees.map((emp) => (
+            <option key={emp.id} value={emp.id}>
+              {emp.name} ({emp.role})
+            </option>
+          ))}
+        </Select>
+        <Input
+          type="file"
+          size="sm"
+          mt={2}
+          onChange={handleDocumentUpload}
+        />
+      </FormControl>
     </Box>
   );
 };
