@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import {
   Box, Heading, Table, Thead, Tbody, Tr, Th, Td,
-  Input, Button, Text, TableContainer
+  Input, Button, Text, TableContainer,
+  FormControl, FormLabel, Select
 } from '@chakra-ui/react';
 
 const API = 'https://ayateke-backend.onrender.com/api/employees';
