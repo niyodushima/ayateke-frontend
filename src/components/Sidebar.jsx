@@ -133,13 +133,14 @@ const Sidebar = ({ onClose }) => {
     };
   }, [load]);
 
-  const adminNav = [
+ const adminNav = [
   { label: 'Dashboard', icon: FaHome, path: '/admin/dashboard' },
   { label: 'Trainings', icon: FaChalkboardTeacher, path: '/admin/training', badge: stats.trainings },
-  { label: 'Branches', icon: FaCodeBranch, path: '/admin/branches' },
+  { label: 'Employees', icon: FaUsers, path: '/admin/employees' }, // ✅ updated
   { label: 'Attendance', icon: FaCalendarCheck, path: '/admin/attendance', badge: stats.todayAttendance },
   { label: 'Settings', icon: FaCog, path: '/admin/settings' },
 ];
+
   const staffNav = [
   { label: 'Dashboard', icon: FaHome, path: '/staff' },
   { label: 'Trainings', icon: FaChalkboardTeacher, path: '/staff/training', badge: stats.trainings },
