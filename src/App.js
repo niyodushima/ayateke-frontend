@@ -5,17 +5,16 @@ import BranchManager from './pages/BranchManager';
 import StaffProfile from './pages/StaffProfile';
 import StaffDirectory from './pages/StaffDirectory';
 import ContractsDashboard from './pages/ContractsDashboard';
-import SalariesDashboard from './pages/SalaryDashboard'; // or './components/SalariesDashboard' if that's where it's saved
+import SalariesDashboard from './pages/SalaryDashboard';
 import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminTrainingDashboard from './pages/AdminTrainingDashboard';
 import Attendance from './pages/Attendance';
 import StaffDashboard from './pages/StaffDashboard';
-import StaffTraining from './components/StaffTraining'; // ✅ moved to pages for consistency
-   // ✅ moved to pages for consistency
+import StaffTraining from './pages/StaffTraining';
 import Employees from './pages/Employees';
-import LeaveRequest from './pages/LeaveRequest';        // ✅ staff leave request
-import LeaveDashboard from './pages/LeaveDashboard';    // ✅ admin leave dashboard
+import LeaveRequest from './pages/LeaveRequest';
+import LeaveDashboard from './pages/LeaveDashboard';
 
 // Layouts
 import DashboardLayout from './layouts/DashboardLayout';
@@ -23,12 +22,10 @@ import DashboardLayout from './layouts/DashboardLayout';
 // ✅ Role-based route guard
 const ProtectedRoute = ({ children, role }) => {
   const user = JSON.parse(localStorage.getItem('user') || 'null');
-
   if (!user) return <Navigate to="/" replace />;
   if (role && user.role !== role) {
     return <Navigate to={user.role === 'admin' ? '/admin/dashboard' : '/staff'} replace />;
   }
-
   return children;
 };
 
@@ -58,14 +55,14 @@ function App() {
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="training" element={<AdminTrainingDashboard />} />
           <Route path="attendance" element={<Attendance />} />
-          <Route path="/employees" element={<Employees />} />
-          <Route path="leave-dashboard" element={<LeaveDashboard />} /> {/* ✅ Leave dashboard */}
-        <Route path="payroll" element={<SalariesDashboard />} /> {/* ✅ Payroll route */}
+          <Route path="employees" element={<Employees />} /> {/* ✅ FIXED: relative path */}
+          <Route path="leave-dashboard" element={<LeaveDashboard />} />
+          <Route path="payroll" element={<SalariesDashboard />} />
           <Route path="contracts" element={<ContractsDashboard />} />
           <Route path="staff" element={<StaffDirectory />} />
           <Route path="staff/:id" element={<StaffProfile />} />
-           <Route path="branches" element={<BranchManager />} />
-</Route>
+          <Route path="branches" element={<BranchManager />} />
+        </Route>
 
         {/* Staff routes */}
         <Route
@@ -79,7 +76,7 @@ function App() {
           <Route index element={<StaffDashboard />} />
           <Route path="profile" element={<StaffProfile />} />
           <Route path="training" element={<StaffTraining />} />
-          <Route path="leave-request" element={<LeaveRequest />} /> {/* ✅ Leave request */}
+          <Route path="leave-request" element={<LeaveRequest />} />
         </Route>
 
         {/* Catch-all */}
