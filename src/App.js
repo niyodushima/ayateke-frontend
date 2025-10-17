@@ -61,7 +61,7 @@ function App() {
           <Route path="contracts" element={<ContractsDashboard />} />
           <Route path="staff" element={<StaffDirectory />} />
           <Route path="staff/:id" element={<StaffProfile />} />
-          <Route path="branches" element={<BranchManager />} />
+         <Route path="employees" element={<EmployeeManager />} />
         </Route>
 
         {/* Staff routes */}
