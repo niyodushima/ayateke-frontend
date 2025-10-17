@@ -102,6 +102,25 @@ const EmployeeManager = () => {
                     onChange={(e) => handleUpdate(emp.id, 'address', e.target.value)}
                   />
                 </Td>
+                <Td>
+                  <FormControl mb={2}>
+  <FormLabel fontSize="sm">Education Background</FormLabel>
+  <Select
+    size="sm"
+    value={newEntry.education}
+    onChange={(e) => setNewEntry({ ...newEntry, education: e.target.value })}
+  >
+    <option value="">Select</option>
+    <option value="PhD">PhD</option>
+    <option value="Masters">Masters</option>
+    <option value="Bachelors">Bachelors</option>
+    <option value="A1">A1</option>
+    <option value="Secondary">Secondary</option>
+    <option value="Primary">Primary</option>
+  </Select>
+</FormControl>
+
+                </Td>
               </Tr>
             ))}
           </Tbody>
