@@ -12,14 +12,12 @@ import AdminTrainingDashboard from './pages/AdminTrainingDashboard';
 import Attendance from './pages/Attendance';
 import StaffDashboard from './pages/StaffDashboard';
 import StaffTraining from './components/StaffTraining';
-import Employees from './pages/Employees';
 import LeaveRequest from './pages/LeaveRequest';
 import LeaveDashboard from './pages/LeaveDashboard';
 
 // Layouts
 import DashboardLayout from './layouts/DashboardLayout';
 
-// ✅ Role-based route guard
 const ProtectedRoute = ({ children, role }) => {
   const user = JSON.parse(localStorage.getItem('user') || 'null');
   if (!user) return <Navigate to="/" replace />;
@@ -29,7 +27,6 @@ const ProtectedRoute = ({ children, role }) => {
   return children;
 };
 
-// ✅ Smart redirect for logged-in users visiting "/"
 const SmartRedirect = () => {
   const user = JSON.parse(localStorage.getItem('user') || 'null');
   if (!user) return <Login />;
@@ -40,46 +37,35 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Public route with smart redirect */}
         <Route path="/" element={<SmartRedirect />} />
 
-        {/* Admin routes */}
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRoute role="admin">
-              <DashboardLayout />
-            </ProtectedRoute>
-          }
-        >
+        <Route path="/admin" element={
+          <ProtectedRoute role="admin">
+            <DashboardLayout />
+          </ProtectedRoute>
+        }>
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="training" element={<AdminTrainingDashboard />} />
           <Route path="attendance" element={<Attendance />} />
-          <Route path="employees" element={<Employees />} /> {/* ✅ FIXED: relative path */}
+          <Route path="employees" element={<EmployeeManager />} />
           <Route path="leave-dashboard" element={<LeaveDashboard />} />
           <Route path="payroll" element={<SalariesDashboard />} />
           <Route path="contracts" element={<ContractsDashboard />} />
           <Route path="staff" element={<StaffDirectory />} />
           <Route path="staff/:id" element={<StaffProfile />} />
-         <Route path="employees" element={<EmployeeManager />} />
         </Route>
 
-        {/* Staff routes */}
-        <Route
-          path="/staff"
-          element={
-            <ProtectedRoute role="staff">
-              <DashboardLayout />
-            </ProtectedRoute>
-          }
-        >
+        <Route path="/staff" element={
+          <ProtectedRoute role="staff">
+            <DashboardLayout />
+          </ProtectedRoute>
+        }>
           <Route index element={<StaffDashboard />} />
           <Route path="profile" element={<StaffProfile />} />
           <Route path="training" element={<StaffTraining />} />
           <Route path="leave-request" element={<LeaveRequest />} />
         </Route>
 
-        {/* Catch-all */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
