@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 // Pages
-import BranchManager from './pages/BranchManager';
+import EmployeeManager from './pages/EmployeeManager';
 import StaffProfile from './pages/StaffProfile';
 import StaffDirectory from './pages/StaffDirectory';
 import ContractsDashboard from './pages/ContractsDashboard';
