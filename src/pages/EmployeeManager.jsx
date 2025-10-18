@@ -13,7 +13,7 @@ const EmployeeManager = () => {
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState(null);
   const [newEntry, setNewEntry] = useState({
-    name: '', role: '', email: '', tel: '', address: '', education: ''
+    name: '', role: '', email: '', tel: '', address: '', education: '', experience: ''
   });
 
   const fetchEmployees = async () => {
@@ -45,7 +45,7 @@ const EmployeeManager = () => {
     try {
       await axios.post(API, newEntry);
       setNewEntry({
-        name: '', role: '', email: '', tel: '', address: '', education: ''
+        name: '', role: '', email: '', tel: '', address: '', education: '', experience: ''
       });
       fetchEmployees();
     } catch (err) {
@@ -88,6 +88,7 @@ const EmployeeManager = () => {
               <Th>Tel</Th>
               <Th>Address</Th>
               <Th>Education</Th>
+              <Th>Experience</Th>
             </Tr>
           </Thead>
           <Tbody>
@@ -142,6 +143,14 @@ const EmployeeManager = () => {
                     <option value="Secondary">Secondary</option>
                     <option value="Primary">Primary</option>
                   </Select>
+                </Td>
+                <Td>
+                  <Input
+                    size="sm"
+                    placeholder="e.g. 5 years"
+                    value={emp.experience || ''}
+                    onChange={(e) => handleUpdate(emp.id, 'experience', e.target.value)}
+                  />
                 </Td>
               </Tr>
             ))}
@@ -202,6 +211,13 @@ const EmployeeManager = () => {
             <option value="Primary">Primary</option>
           </Select>
         </FormControl>
+        <Input
+          size="sm"
+          placeholder="Experience (e.g. 3 years)"
+          value={newEntry.experience}
+          onChange={(e) => setNewEntry({ ...newEntry, experience: e.target.value })}
+          mb={2}
+        />
         <Button size="sm" colorScheme="teal" onClick={handleAdd}>
           + Add Employee
         </Button>
