@@ -13,7 +13,7 @@ const EmployeeManager = () => {
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState(null);
   const [newEntry, setNewEntry] = useState({
-    name: '', role: '', email: '', tel: '', address: '', education: '', experience: ''
+    name: '', role: '', email: '', tel: '', address: '', education: '', work_experience: ''
   });
 
   const fetchEmployees = async () => {
@@ -45,7 +45,7 @@ const EmployeeManager = () => {
     try {
       await axios.post(API, newEntry);
       setNewEntry({
-        name: '', role: '', email: '', tel: '', address: '', education: '', experience: ''
+        name: '', role: '', email: '', tel: '', address: '', education: '', work_experience: ''
       });
       fetchEmployees();
     } catch (err) {
@@ -88,7 +88,7 @@ const EmployeeManager = () => {
               <Th>Tel</Th>
               <Th>Address</Th>
               <Th>Education</Th>
-              <Th>Experience</Th>
+              <Th>Work Experience</Th>
             </Tr>
           </Thead>
           <Tbody>
@@ -148,8 +148,8 @@ const EmployeeManager = () => {
                   <Input
                     size="sm"
                     placeholder="e.g. 5 years"
-                    value={emp.experience || ''}
-                    onChange={(e) => handleUpdate(emp.id, 'experience', e.target.value)}
+                    value={emp.work_experience || ''}
+                    onChange={(e) => handleUpdate(emp.id, 'work_experience', e.target.value)}
                   />
                 </Td>
               </Tr>
@@ -213,9 +213,9 @@ const EmployeeManager = () => {
         </FormControl>
         <Input
           size="sm"
-          placeholder="Experience (e.g. 3 years)"
-          value={newEntry.experience}
-          onChange={(e) => setNewEntry({ ...newEntry, experience: e.target.value })}
+          placeholder="Work Experience (e.g. 3 years)"
+          value={newEntry.work_experience}
+          onChange={(e) => setNewEntry({ ...newEntry, work_experience: e.target.value })}
           mb={2}
         />
         <Button size="sm" colorScheme="teal" onClick={handleAdd}>
