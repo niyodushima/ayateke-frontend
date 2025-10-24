@@ -3,7 +3,7 @@ import axios from 'axios';
 import {
   Box, Heading, Table, Thead, Tbody, Tr, Th, Td,
   Input, Button, Text, TableContainer,
-  FormControl, FormLabel, Select
+  FormControl, Select
 } from '@chakra-ui/react';
 
 const API = 'https://ayateke-backend.onrender.com/api/employees';
@@ -11,9 +11,8 @@ const API = 'https://ayateke-backend.onrender.com/api/employees';
 const EmployeeManager = () => {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedId, setSelectedId] = useState(null);
   const [newEntry, setNewEntry] = useState({
-    name: '', role: '', email: '', tel: '', address: '', education: '', work_experience: ''
+    name: '', position: '', email: '', tel: '', education: '', work_experience: ''
   });
 
   const fetchEmployees = async () => {
@@ -41,34 +40,15 @@ const EmployeeManager = () => {
   };
 
   const handleAdd = async () => {
-    if (!newEntry.name || !newEntry.role) return;
+    if (!newEntry.name || !newEntry.position) return;
     try {
       await axios.post(API, newEntry);
       setNewEntry({
-        name: '', role: '', email: '', tel: '', address: '', education: '', work_experience: ''
+        name: '', position: '', email: '', tel: '', education: '', work_experience: ''
       });
       fetchEmployees();
     } catch (err) {
       console.error('Error adding employee:', err.message);
-    }
-  };
-
-  const handleDocumentUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file || !selectedId) return;
-
-    const docMeta = {
-      name: file.name,
-      type: file.type
-    };
-
-    try {
-      await axios.post(`${API}/${selectedId}/documents`, docMeta);
-      fetchEmployees();
-      alert('Document attached successfully');
-    } catch (err) {
-      console.error('Upload error:', err.message);
-      alert('Failed to attach document');
     }
   };
 
@@ -83,10 +63,9 @@ const EmployeeManager = () => {
           <Thead>
             <Tr>
               <Th>Name</Th>
-              <Th>Role</Th>
+              <Th>Position</Th>
               <Th>Email</Th>
               <Th>Tel</Th>
-              <Th>Address</Th>
               <Th>Education</Th>
               <Th>Work Experience</Th>
             </Tr>
@@ -104,8 +83,8 @@ const EmployeeManager = () => {
                 <Td>
                   <Input
                     size="sm"
-                    value={emp.role || ''}
-                    onChange={(e) => handleUpdate(emp.id, 'role', e.target.value)}
+                    value={emp.position || ''}
+                    onChange={(e) => handleUpdate(emp.id, 'position', e.target.value)}
                   />
                 </Td>
                 <Td>
@@ -120,13 +99,6 @@ const EmployeeManager = () => {
                     size="sm"
                     value={emp.tel || ''}
                     onChange={(e) => handleUpdate(emp.id, 'tel', e.target.value)}
-                  />
-                </Td>
-                <Td>
-                  <Input
-                    size="sm"
-                    value={emp.address || ''}
-                    onChange={(e) => handleUpdate(emp.id, 'address', e.target.value)}
                   />
                 </Td>
                 <Td>
@@ -169,9 +141,9 @@ const EmployeeManager = () => {
         />
         <Input
           size="sm"
-          placeholder="Role"
-          value={newEntry.role}
-          onChange={(e) => setNewEntry({ ...newEntry, role: e.target.value })}
+          placeholder="Position"
+          value={newEntry.position}
+          onChange={(e) => setNewEntry({ ...newEntry, position: e.target.value })}
           mb={2}
         />
         <Input
@@ -188,15 +160,8 @@ const EmployeeManager = () => {
           onChange={(e) => setNewEntry({ ...newEntry, tel: e.target.value })}
           mb={2}
         />
-        <Input
-          size="sm"
-          placeholder="Address"
-          value={newEntry.address}
-          onChange={(e) => setNewEntry({ ...newEntry, address: e.target.value })}
-          mb={2}
-        />
         <FormControl mb={2}>
-          <FormLabel fontSize="sm">Education Background</FormLabel>
+          <Text fontSize="sm">Education Background</Text>
           <Select
             size="sm"
             value={newEntry.education}
@@ -222,29 +187,6 @@ const EmployeeManager = () => {
           + Add Employee
         </Button>
       </Box>
-
-      <Heading size="sm" mb={2}>Attach Document to Employee</Heading>
-      <FormControl mb={4}>
-        <FormLabel fontSize="sm">Select Employee</FormLabel>
-        <Select
-          size="sm"
-          placeholder="Choose employee"
-          value={selectedId || ''}
-          onChange={(e) => setSelectedId(e.target.value)}
-        >
-          {employees.map((emp) => (
-            <option key={emp.id} value={emp.id}>
-              {emp.name} ({emp.role})
-            </option>
-          ))}
-        </Select>
-        <Input
-          type="file"
-          size="sm"
-          mt={2}
-          onChange={handleDocumentUpload}
-        />
-      </FormControl>
     </Box>
   );
 };
