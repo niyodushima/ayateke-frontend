@@ -135,8 +135,8 @@ const Sidebar = ({ onClose }) => {
 
  const adminNav = [
   { label: 'Dashboard', icon: FaHome, path: '/admin/dashboard' },
-  { label: 'Trainings', icon: FaChalkboardTeacher, path: '/admin/training', badge: stats.trainings },
   { label: 'Employees', icon: FaUsers, path: '/admin/employees' }, // ✅ updated
+  { label: 'Trainings', icon: FaChalkboardTeacher, path: '/admin/training', badge: stats.trainings },
   { label: 'Attendance', icon: FaCalendarCheck, path: '/admin/attendance', badge: stats.todayAttendance },
   { label: 'Settings', icon: FaCog, path: '/admin/settings' },
 ];
