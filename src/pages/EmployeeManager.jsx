@@ -3,7 +3,7 @@ import axios from 'axios';
 import {
   Box, Heading, Table, Thead, Tbody, Tr, Th, Td,
   Input, Button, Text, TableContainer,
-  FormControl, Select
+  FormControl, FormLabel, Select
 } from '@chakra-ui/react';
 
 const API = 'https://ayateke-backend.onrender.com/api/employees';
@@ -12,7 +12,8 @@ const EmployeeManager = () => {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [newEntry, setNewEntry] = useState({
-    name: '', position: '', email: '', tel: '', education: '', work_experience: ''
+    name: '', position: '', email: '', tel: '',
+    education: '', field_of_study: '', work_experience: ''
   });
 
   const fetchEmployees = async () => {
@@ -44,7 +45,8 @@ const EmployeeManager = () => {
     try {
       await axios.post(API, newEntry);
       setNewEntry({
-        name: '', position: '', email: '', tel: '', education: '', work_experience: ''
+        name: '', position: '', email: '', tel: '',
+        education: '', field_of_study: '', work_experience: ''
       });
       fetchEmployees();
     } catch (err) {
@@ -67,6 +69,7 @@ const EmployeeManager = () => {
               <Th>Email</Th>
               <Th>Tel</Th>
               <Th>Education</Th>
+              <Th>Field of Study</Th>
               <Th>Work Experience</Th>
             </Tr>
           </Thead>
@@ -119,6 +122,14 @@ const EmployeeManager = () => {
                 <Td>
                   <Input
                     size="sm"
+                    placeholder="e.g. Business"
+                    value={emp.field_of_study || ''}
+                    onChange={(e) => handleUpdate(emp.id, 'field_of_study', e.target.value)}
+                  />
+                </Td>
+                <Td>
+                  <Input
+                    size="sm"
                     placeholder="e.g. 5 years"
                     value={emp.work_experience || ''}
                     onChange={(e) => handleUpdate(emp.id, 'work_experience', e.target.value)}
@@ -161,7 +172,7 @@ const EmployeeManager = () => {
           mb={2}
         />
         <FormControl mb={2}>
-          <Text fontSize="sm">Education Background</Text>
+          <FormLabel fontSize="sm">Education Background</FormLabel>
           <Select
             size="sm"
             value={newEntry.education}
@@ -176,6 +187,13 @@ const EmployeeManager = () => {
             <option value="Primary">Primary</option>
           </Select>
         </FormControl>
+        <Input
+          size="sm"
+          placeholder="Field of Study (e.g. Business)"
+          value={newEntry.field_of_study}
+          onChange={(e) => setNewEntry({ ...newEntry, field_of_study: e.target.value })}
+          mb={2}
+        />
         <Input
           size="sm"
           placeholder="Work Experience (e.g. 3 years)"
