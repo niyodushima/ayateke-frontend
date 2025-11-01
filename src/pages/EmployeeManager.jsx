@@ -12,7 +12,7 @@ const EmployeeManager = () => {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [newEntry, setNewEntry] = useState({
-    name: '', position: '', email: '', tel: '',
+    name: '', role: '', email: '', tel: '',
     education: '', field_of_study: '', work_experience: ''
   });
 
@@ -41,11 +41,11 @@ const EmployeeManager = () => {
   };
 
   const handleAdd = async () => {
-    if (!newEntry.name || !newEntry.position) return;
+    if (!newEntry.name || !newEntry.role) return;
     try {
       await axios.post(API, newEntry);
       setNewEntry({
-        name: '', position: '', email: '', tel: '',
+        name: '', role: '', email: '', tel: '',
         education: '', field_of_study: '', work_experience: ''
       });
       fetchEmployees();
@@ -65,7 +65,7 @@ const EmployeeManager = () => {
           <Thead>
             <Tr>
               <Th>Name</Th>
-              <Th>Position</Th>
+              <Th>Role</Th>
               <Th>Email</Th>
               <Th>Tel</Th>
               <Th>Education</Th>
@@ -79,6 +79,7 @@ const EmployeeManager = () => {
                 <Td>
                   <Input
                     size="sm"
+                    width="100%"
                     value={emp.name || ''}
                     onChange={(e) => handleUpdate(emp.id, 'name', e.target.value)}
                   />
@@ -86,13 +87,15 @@ const EmployeeManager = () => {
                 <Td>
                   <Input
                     size="sm"
-                    value={emp.position || ''}
-                    onChange={(e) => handleUpdate(emp.id, 'position', e.target.value)}
+                    width="100%"
+                    value={emp.role || ''}
+                    onChange={(e) => handleUpdate(emp.id, 'role', e.target.value)}
                   />
                 </Td>
                 <Td>
                   <Input
                     size="sm"
+                    width="100%"
                     value={emp.email || ''}
                     onChange={(e) => handleUpdate(emp.id, 'email', e.target.value)}
                   />
@@ -100,6 +103,7 @@ const EmployeeManager = () => {
                 <Td>
                   <Input
                     size="sm"
+                    width="100%"
                     value={emp.tel || ''}
                     onChange={(e) => handleUpdate(emp.id, 'tel', e.target.value)}
                   />
@@ -107,6 +111,7 @@ const EmployeeManager = () => {
                 <Td>
                   <Select
                     size="sm"
+                    width="100%"
                     value={emp.education || ''}
                     onChange={(e) => handleUpdate(emp.id, 'education', e.target.value)}
                   >
@@ -122,6 +127,7 @@ const EmployeeManager = () => {
                 <Td>
                   <Input
                     size="sm"
+                    width="100%"
                     placeholder="e.g. Business"
                     value={emp.field_of_study || ''}
                     onChange={(e) => handleUpdate(emp.id, 'field_of_study', e.target.value)}
@@ -130,6 +136,7 @@ const EmployeeManager = () => {
                 <Td>
                   <Input
                     size="sm"
+                    width="100%"
                     placeholder="e.g. 5 years"
                     value={emp.work_experience || ''}
                     onChange={(e) => handleUpdate(emp.id, 'work_experience', e.target.value)}
@@ -145,6 +152,7 @@ const EmployeeManager = () => {
       <Box mb={4}>
         <Input
           size="sm"
+          width="100%"
           placeholder="Name"
           value={newEntry.name}
           onChange={(e) => setNewEntry({ ...newEntry, name: e.target.value })}
@@ -152,13 +160,15 @@ const EmployeeManager = () => {
         />
         <Input
           size="sm"
-          placeholder="Position"
-          value={newEntry.position}
-          onChange={(e) => setNewEntry({ ...newEntry, position: e.target.value })}
+          width="100%"
+          placeholder="Role"
+          value={newEntry.role}
+          onChange={(e) => setNewEntry({ ...newEntry, role: e.target.value })}
           mb={2}
         />
         <Input
           size="sm"
+          width="100%"
           placeholder="Email"
           value={newEntry.email}
           onChange={(e) => setNewEntry({ ...newEntry, email: e.target.value })}
@@ -166,6 +176,7 @@ const EmployeeManager = () => {
         />
         <Input
           size="sm"
+          width="100%"
           placeholder="Tel"
           value={newEntry.tel}
           onChange={(e) => setNewEntry({ ...newEntry, tel: e.target.value })}
@@ -175,6 +186,7 @@ const EmployeeManager = () => {
           <FormLabel fontSize="sm">Education Background</FormLabel>
           <Select
             size="sm"
+            width="100%"
             value={newEntry.education}
             onChange={(e) => setNewEntry({ ...newEntry, education: e.target.value })}
           >
@@ -189,6 +201,7 @@ const EmployeeManager = () => {
         </FormControl>
         <Input
           size="sm"
+          width="100%"
           placeholder="Field of Study (e.g. Business)"
           value={newEntry.field_of_study}
           onChange={(e) => setNewEntry({ ...newEntry, field_of_study: e.target.value })}
@@ -196,6 +209,7 @@ const EmployeeManager = () => {
         />
         <Input
           size="sm"
+          width="100%"
           placeholder="Work Experience (e.g. 3 years)"
           value={newEntry.work_experience}
           onChange={(e) => setNewEntry({ ...newEntry, work_experience: e.target.value })}
